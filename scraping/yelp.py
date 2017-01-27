@@ -1,4 +1,5 @@
 
+import requests
 
 
 import re
@@ -9,69 +10,21 @@ import json
 import sys
 import csv
 
+url = "https://www.yelp.com/biz/alinea-chicago?osq=Restaurants"
 
-INDEX_IGNORE = set(['a',  'also',  'an',  'and',  'are', 'as',  'at',  'be',
-                    'but',  'by',  'course',  'for',  'from',  'how', 'i',
-                    'ii',  'iii',  'in',  'include',  'is',  'not',  'of',
-                    'on',  'or',  's',  'sequence',  'so',  'social',  'students',
-                    'such',  'that',  'the',  'their',  'this',  'through',  'to',
-                    'topics',  'units', 'we', 'were', 'which', 'will', 'with', 'yet'])
+request = requests.get(url)
+encoding = request.encoding
+html = request.text.encode(encoding)
+soup = bs4.BeautifulSoup(html, "html5lib")
+aggregateRating = soup.find_all("div", itemprop="aggregateRating")
+aggregateRating_tag = aggregateRating[0]
+meta = aggregateRating_tag.find_all("meta")
+meta_tag = meta[0]
 
-
-
-def go(num_pages_to_crawl, course_map_filename, index_filename):
-    '''
-    Crawl the college catalog and generates a CSV file with an index.
-
-    Inputs:
-        num_pages_to_crawl: the number of pages to process during the crawl
-        course_map_filename: the name of a JSON file that contains the mapping
-          course codes to course identifiers
-        index_filename: the name for the CSV of the index.
-
-    Outputs: 
-        CSV file of the index index.
-    '''
-
-    starting_url = "https://www.classes.cs.uchicago.edu/archive/2015/winter/12200-1/new.collegecatalog.uchicago.edu/index.html"
-    limiting_domain = "classes.cs.uchicago.edu"
-    data = {"queue": [starting_url], "links visited": [], "index": []}
-
-    scrape = extract_links(starting_url, limiting_domain, course_map_filename, data)
-    data = scrape
-    queue = data["queue"]
-    index = data["index"]
-    links_visited = data["links visited"]
-   
-    
-    for link in queue:
-        if len(links_visited) < num_pages_to_crawl:
-            scrape = extract_links(link, limiting_domain, course_map_filename, data)
-            data = scrape
-        else:
-            return
-
-    index = data["index"]
-    write_into_csv(index_filename, index)
-    return
 
         
 def extract_links(page, limiting_domain, course_map_filename, data):
-    '''
-    Scrapes a given webpage for for appropriate links. 
-
-    Inputs:
-        page: link of page to be scraped
-        course_map_filename: the name of a JSON file that contains the mapping
-          course codes to course identifiers
-        data: dictionary that holds three keys -- "queue" a FIFO list which gives the order
-            of the links to be scraped; "links_visited" to keep track of links visited
-            (define visit as "called request on"), and "index" a list of entries into the
-            indexer.
-
-    Outputs: 
-        Data: a dictionary
-    '''
+    
     queue = data["queue"]
     links_visited = data["links visited"]
     index = data['index']

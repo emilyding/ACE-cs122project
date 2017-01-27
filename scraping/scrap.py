@@ -19,12 +19,23 @@ def cook_soup(url):
 
 
 def get_info(soup):
-    name_tag = soup.find_all("h1", property = "name")
+    name_tag = soup.find_all('h1', property = "name")
     name = name_tag[0].text
     name = name.replace("\n", "")
 
-    rating_tag = soup.find_all("img", property = "ratingValue")
+    rating_tag = soup.find_all('img', property = "ratingValue")
     rating = rating_tag[0]["content"]
+
+    price_tag = soup.find_all('div', class_ = "detail first price_rating separator")
+    price = price_tag[0].text
+    price = price.replace("\n", "")
+
+    
+    cuisine_all = soup.find_all('div', class_ = "detail separator")
+    cuisine_tags = cuisine_all[0].find_all('a')
+    cuisine = []
+    for cuisine_tag in cuisine_tags:
+        cuisine.append(cuisine_tag.text)
 
     address_tag = soup.find_all('span', property = "streetAddress")
     address = address_tag[0].text
@@ -47,8 +58,21 @@ def get_info(soup):
     phone = phone[0].replace("-", "")
     # returns in form 3126671701
 
-    return name, rating, address, city, state, zipcode, country, phone
+    restaurant_info = {
+    "name": name,
+    "rating": rating,
+    "price": price
+    "cuisine": cuisine
+    "address": address, 
+    "city": city,
+    "state": state, 
+    "zipcode": zipcode,
+    "country": country,
+    "phone": phone
 
+    }
+
+    return restaurant_info
 
 #name = re.findall()
 
@@ -56,5 +80,3 @@ def get_info(soup):
 #    word_list = []
 
 #    words = re.findall("[A-Za-z]\w*", lower_text)
-
-

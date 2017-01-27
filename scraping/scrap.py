@@ -23,6 +23,9 @@ def get_info(soup):
     name = name_tag[0].text
     name = name.replace("\n", "")
 
+    rating_tag = soup.find_all("img", property = "ratingValue")
+    rating = rating_tag[0]["content"]
+
     address_tag = soup.find_all('span', property = "streetAddress")
     address = address_tag[0].text
 
@@ -44,7 +47,7 @@ def get_info(soup):
     phone = phone[0].replace("-", "")
     # returns in form 3126671701
 
-    return name, address, city, state, zipcode, country, phone
+    return name, rating, address, city, state, zipcode, country, phone
 
 
 #name = re.findall()

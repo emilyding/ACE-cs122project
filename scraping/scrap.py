@@ -38,7 +38,13 @@ def get_info(soup):
     zipcode_tag = soup.find_all('span', property = "postalCode")
     zipcode = zipcode_tag[0].text
 
-    return name, address, city, state, zipcode, country
+    phone_tag = soup.find_all('div', class_ = "fl phoneNumber")
+    phone = phone_tag[0].text
+    phone = re.findall("[0-9-]{12}", phone)
+    phone = phone[0].replace("-", "")
+    # returns in form 3126671701
+
+    return name, address, city, state, zipcode, country, phone
 
 
 #name = re.findall()

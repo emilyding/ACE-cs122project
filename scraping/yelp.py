@@ -16,52 +16,35 @@ request = requests.get(url)
 encoding = request.encoding
 html = request.text.encode(encoding)
 soup = bs4.BeautifulSoup(html, "html5lib")
+
+#rating
 aggregateRating = soup.find_all("div", itemprop="aggregateRating")
 aggregateRating_tag = aggregateRating[0]
 meta = aggregateRating_tag.find_all("meta")
 meta_tag = meta[0]
+rating = meta_tag["content"]
+
+#num_reviews
+span = aggregateRating_tag.find_all("span")
+span_tag = span[0]
+num_reviews = span_tag.text
+
+
+#pricing
+price = soup.find_all("div", class_="price-category")
+price_tag = price[0]
+dollar = price_tag.find_all("span", class_="business-attribute price-range")
+dollar_tag = dollar[0]
+price_bracket = dollar_tag.text
+
+#phonenumber
+bizphone = soup.find_all("span", class_="bizphone")
+phone_tag = bizphone[0]
+phonenumber = phone_tag.text
+num_pattern = r'([/(][0-9]{3}[/)])'
 
 
         
-def extract_links(page, limiting_domain, course_map_filename, data):
-    
-    queue = data["queue"]
-    links_visited = data["links visited"]
-    index = data['index']
-
-    
-    if util.is_url_ok_to_follow(page, limiting_domain) and page not in links_visited:
-        request_page = util.get_request(page)
-        if request_page is None:
-            return data
-        html_page = util.read_request(request_page)
-        url = util.get_request_url(request_page)
-        new_index= create_index_entry(html_page, course_map_filename, index)
-        index = new_index
-
-        
-        if util.is_url_ok_to_follow(url, limiting_domain) and url not in links_visited:
-            links_visited.append(url)
-            if url != page:
-                links_visited.append(page)
-            soup = bs4.BeautifulSoup(html_page, "html5lib")
-            links = soup.find_all("a")
-
-            for tag in links:
-                i = links.index(tag)
-                if tag.has_attr("href"):
-                    links[i] = tag["href"]
-                else:
-                    links[i] = "link"
-
-            for link in links:
-                link = util.remove_fragment(link)
-                if util.is_absolute_url(link) == False:
-                    link = util.convert_if_relative_url(page, link)
-                if util.is_url_ok_to_follow(link, limiting_domain) and link not in links_visited and link not in queue:
-                    queue.append(link)
-    data = {"queue": queue, "links visited": links_visited, "index": index}
-    return data
 
 
 

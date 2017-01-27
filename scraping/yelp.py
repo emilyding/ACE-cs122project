@@ -38,13 +38,14 @@ dollar_tag = dollar[0]
 price_bracket = dollar_tag.text
 
 #phonenumber
-bizphone = soup.find_all("span", class_="bizphone")
+bizphone = soup.find_all("span", class_="biz-phone")
 phone_tag = bizphone[0]
 phonenumber = phone_tag.text
-num_pattern = r'([/(][0-9]{3}[/)])'
-
-
-        
+(312) 867-0110
+#num_pattern = r'[0-9][0-9()\s-]{12}'
+pattern = r'([0-9]{3})(.){2}([0-9]{3})(.)([0-9]{4})'
+match = re.findall(pattern, phonenumber)
+phonenumber = str(match[0][0])+str(match[0][3])+str(match[0])[5])
 
 
 

@@ -18,6 +18,8 @@ def make_two_tables(database, data_table):
 
     # Delete existing table
     c.execute("""DROP TABLE IF EXISTS restaurant;""")
+    c.execute("""DROP TABLE IF EXISTS cuisines;""")
+
 
     create_restaurant_table = """
         CREATE TABLE restaurant ( 
@@ -46,11 +48,14 @@ def make_two_tables(database, data_table):
 
     for entry in data_table:
         # Append restaurant entry except cuisine to restaurant_sql
-        restauraunt_entry = entry[:4].append(entry[6])
+        restaurant_entry = entry[:5]
+        restaurant_entry.append(entry[6])
         restaurant_sql.append(restaurant_entry)
+        print(restaurant_sql)
         
         for cuisine_type in entry[5]:
             cuisine_sql.append([entry[0], cuisine_type])
+            print(cuisine_sql)
 
     c.executemany(add_restaurant_data, restaurant_sql)
     c.executemany(add_cuisine_data, cuisine_sql)

@@ -33,9 +33,9 @@ def make_two_tables(database, data_table):
     
     create_cuisine_table = """
         CREATE TABLE cuisines (
-        id INTEGER PRIMARY KEY,
-        cuisine VARCHAR(20))
-    """
+        id INTEGER,
+        cuisine VARCHAR(20)
+        );"""
 
     c.execute(create_restaurant_table)
     c.execute(create_cuisine_table)
@@ -51,11 +51,9 @@ def make_two_tables(database, data_table):
         restaurant_entry = entry[:5]
         restaurant_entry.append(entry[6])
         restaurant_sql.append(restaurant_entry)
-        print(restaurant_sql)
         
         for cuisine_type in entry[5]:
             cuisine_sql.append([entry[0], cuisine_type])
-            print(cuisine_sql)
 
     c.executemany(add_restaurant_data, restaurant_sql)
     c.executemany(add_cuisine_data, cuisine_sql)
@@ -78,19 +76,27 @@ def get_ratings(query, database):
 
     header = ["ID", "City", "Source", "Price", "# Reviews", "Cuisine Tags", "Stars"]
     
-    search_string = '''SELECT city, cuisine, AVG(stars) as rating
+    search_string = '''SELECT city, cuisine, price, AVG(stars) as rating
     FROM restaurant
     JOIN cuisines
-    ON restaurant.id = cuisine.id
+    ON restaurant.id = cuisines.id
     WHERE city = ?
     GROUP BY cuisine
-    ORDER BY rating DESC;
+    ORDER BY rating DESC
     '''
+    params = []
+    city = query["city"]
+    params.append(city)
+
+    if "limit" in query:
+        search_string += '''LIMIT ?;'''
+        params.append(query["limit"])
+    else:
+        search_string += ''';'''
 
     # Things to consider: how to do prices?
     
-    city = query["city"]
-    results = c.execute(search_string, city)
+    results = c.execute(search_string, params)
     result_table = results.fetchall()
 
     connection.commit()

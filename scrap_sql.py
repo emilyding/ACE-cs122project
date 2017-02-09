@@ -76,7 +76,8 @@ def get_ratings(query, database):
 
     header = ["ID", "City", "Source", "Price", "# Reviews", "Cuisine Tags", "Stars"]
     
-    search_string = '''SELECT city, cuisine, price, AVG(stars) as rating
+    search_string = '''SELECT city, cuisine, price, AVG(stars) as rating, 
+    COUNT(*) as num_restaurants
     FROM restaurant
     JOIN cuisines
     ON restaurant.id = cuisines.id
@@ -102,7 +103,7 @@ def get_ratings(query, database):
     connection.commit()
     c.connection.close()
 
-    return (["City", "Cuisine", "Price", "Rating"], result_table)
+    return (["City", "Cuisine", "Price", "Rating", "# Restaurants"], result_table)
 
 
 

@@ -10,21 +10,21 @@ test_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?locatio
 
 def run_code():
     # Camille's API
-    API = "AIzaSyCP58u53oJ_brOYoNkF0ktaCE2EyZaJIyA"
+    #API = "AIzaSyCP58u53oJ_brOYoNkF0ktaCE2EyZaJIyA"
     
     # Emily's API
-    # API = "AIzaSyDW15a3LCSe7J1YDRvUMWR1IsVlMxqQtRU"
+    API = "AIzaSyDW15a3LCSe7J1YDRvUMWR1IsVlMxqQtRU"
     
     # Austin's API
     # API = "AIzaSyB28WD_QVBYhUlO3fr22uMNr2zemUA7ZyQ"
-    run_number = 5 #haven't done this one yet
+    run_number = 1 #haven't done this one yet
     full_results = []
 
     # locations dict with key city: [lat, long, radius (est.)]
-    locations = {"Chicago": [41.881832, -87.623177, 15.297]}#,
-    #            "LA": [34.052235, -118.243683, 22.428],
-    #            "New York": [40.730610, -73.935242, 17.453],
-    #            "San Francisco": [37.733795, -122.446747, 6.846],
+    locations = {#"Chicago": [41.881832, -87.623177, 15.297]}#,
+                "LA": [34.052235, -118.243683, 22.428]}
+    #            "New York": [40.730610, -73.935242, 17.453]}
+    #            "San Francisco": [37.733795, -122.446747, 6.846]}
     #            "Houston": [29.7604, -95.3698, 25.040]}
     for city in locations:
         city_name = city
@@ -33,10 +33,10 @@ def run_code():
         # Converts radius from miles into lat/lon degrees
         radius_deg = info[2] / 69
         
-        #lat = info[0] - radius_deg # COMMENT OUT IF MID CITY
-        lat = 42.040136347826036# UNCOMMENT IF MID CITY
-        #lon = info[1] - radius_deg # COMMENT OUT IF MID CITY
-        lon = -87.69487265217385# UNCOMMENT IF MID CITY
+        lat = info[0] - radius_deg # COMMENT OUT IF MID CITY
+        #lat = 42.040136347826036# UNCOMMENT IF MID CITY
+        lon = info[1] - radius_deg # COMMENT OUT IF MID CITY
+        #lon = -87.69487265217385# UNCOMMENT IF MID CITY
         start_lon = info[1] - radius_deg
         stop_lat = info[0] + radius_deg
         stop_lon = info[1] + radius_deg
@@ -52,7 +52,7 @@ def run_code():
     csv_name = "zagat_" + city_name + "_" + str(run_number) + ".csv"
     with open(csv_name,"w") as f:
         wr = csv.writer(f)
-        wr.writerows([["name", "place_id", "price_level", "rating"]] + full_results)
+        wr.writerows([["name", "place_id", "street address", "city", "zipcode" "price_level", "rating"]] + full_results)
 
     return (city_name, lat, lon)
 
@@ -65,7 +65,7 @@ def cook_soup(API, lat, lon, stop_lat, stop_lon, start_lon):
         
     while request_num < 500: #- 3:
         # Loops over city area, pulls restaurant results
-        if lat >= stop_lat and lon >= stop_lon:
+        if lat >= stop_lat:
             print("finished searching city")
             break
 
@@ -78,9 +78,32 @@ def cook_soup(API, lat, lon, stop_lat, stop_lon, start_lon):
                 for result in list_results:
                     name = result.get("name", None)
                     place_id = result.get("place_id", None)
+                    address_data = get_results(
+                        "https://maps.googleapis.com/maps/api/place/details/json?placeid=" + place_id + "&key=" + API)
+                    if "result" in address_data:
+                        if "address_components" in address_data["result"]:
+                            address_components = address_data["result"]["address_components"]
+                            for component in address_components:
+                                if "street_number" in component["types"]:
+                                    street_number = component.get("long_name", None)
+                                elif "route" in component["types"]:
+                                    street = component.get("long_name", None)
+                                    street = street_number + " " + street
+                                elif "locality" in component["types"]:
+                                    city = component.get("long_name", None)
+                                elif "postal_code" in component["types"]:
+                                    zipcode = component.get("long_name", None)
+                        else:
+                            street = None
+                            city = None
+                            zipcode = None 
+                    else:
+                        street = None
+                        city = None
+                        zipcode = None
                     price_level = result.get("price_level", None)
                     rating = result.get("rating", None)
-                    results.append([name, place_id, price_level, rating])
+                    results.append([name, place_id, street, city, zipcode, price_level, rating])
             
                 # If > 20 locations, pulls up to 40 more
                 if "next_page_token" in request_dict:
@@ -91,9 +114,32 @@ def cook_soup(API, lat, lon, stop_lat, stop_lon, start_lon):
                     for result in list_results:
                         name = result.get("name", None)
                         place_id = result.get("place_id", None)
+                        address_data = get_results(
+                            "https://maps.googleapis.com/maps/api/place/details/json?placeid=" + place_id + "&key=" + API)
+                        if "result" in address_data:
+                            if "address_components" in address_data["result"]:
+                                address_components = address_data["result"]["address_components"]
+                                for component in address_components:
+                                    if "street_number" in component["types"]:
+                                        street_number = component.get("long_name", None)
+                                    elif "route" in component["types"]:
+                                        street = component.get("long_name", None)
+                                        street = street_number + " " + street
+                                    elif "locality" in component["types"]:
+                                        city = component.get("long_name", None)
+                                    elif "postal_code" in component["types"]:
+                                        zipcode = component.get("long_name", None)
+                            else:
+                                street = None
+                                city = None
+                                zipcode = None 
+                        else:
+                            street = None
+                            city = None
+                            zipcode = None
                         price_level = result.get("price_level", None)
                         rating = result.get("rating", None)
-                        results.append([name, place_id, price_level, rating])
+                        results.append([name, place_id, street, city, zipcode, price_level, rating])
                     request_num += 1
                     if "next_page_token" in request_dict:
                         request_dict = get_results(
@@ -103,9 +149,32 @@ def cook_soup(API, lat, lon, stop_lat, stop_lon, start_lon):
                         for result in list_results:
                             name = result.get("name", None)
                             place_id = result.get("place_id", None)
+                            address_data = get_results(
+                                "https://maps.googleapis.com/maps/api/place/details/json?placeid=" + place_id + "&key=" + API)
+                            if "result" in address_data:
+                                if "address_components" in address_data["result"]:
+                                    address_components = address_data["result"]["address_components"]
+                                    for component in address_components:
+                                        if "street_number" in component["types"]:
+                                            street_number = component.get("long_name", None)
+                                        elif "route" in component["types"]:
+                                            street = component.get("long_name", None)
+                                            street = street_number + " " + street
+                                        elif "locality" in component["types"]:
+                                            city = component.get("long_name", None)
+                                        elif "postal_code" in component["types"]:
+                                            zipcode = component.get("long_name", None)
+                                else:
+                                    street = None
+                                    city = None
+                                    zipcode = None 
+                            else:
+                                street = None
+                                city = None
+                                zipcode = None
                             price_level = result.get("price_level", None)
                             rating = result.get("rating", None)
-                            results.append([name, place_id, price_level, rating])
+                            results.append([name, place_id, street, city, zipcode, price_level, rating])
                         request_num += 1
                 lon += .01
                 request_num += 1

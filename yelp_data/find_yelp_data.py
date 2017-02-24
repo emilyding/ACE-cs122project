@@ -13,8 +13,7 @@ saving a file destination for cuisine tags.
 
 # Defaults for testing
 #filepath = "yelp_cuisines.csv"
-#f = yelp.search(term = "restaurant", price = "3", 
-#    categories = "mexican", location='chicago', limit=1)
+#f = yelp.search(term = "restaurant", price = "3", categories = "mexican", location='chicago', limit=1)
 # sample_cuisines = ["afghani", "austrian"]
 
 # Imports
@@ -50,6 +49,7 @@ def find_restaurants_in_city(city, filepath):
     used_cuisines = []
     unique_id = 100000
     cuisine_tags = find_cuisines(filepath)
+    #cuisine_tags = ["afghani", "arabian", "burmese"]
 
     # For each cuisine tag, search all matching restaurants
     for tag in cuisine_tags:
@@ -93,6 +93,72 @@ def find_restaurants_in_city(city, filepath):
     df.to_csv("yelp_{}.csv".format(city))
 
     return df
+
+def find_cuisines(filepath):
+    '''
+    Reads a csv copied from yelp's category_list for v3, found here:
+    https://www.yelp.com/developers/documentation/v3/category_list
+    and converts to a usable list of string tags.
+
+    Inputs:
+        - filepath: Filepath for the location of the csv
+
+    Returns:
+        - cuisine_tags: A list of strings
+    '''
+
+    # Open csv
+    with open(filepath, 'r') as f:
+        reader = csv.reader(f)
+        cuisine_list = list(reader)
+
+    # Translate to usable form
+    cuisine_tags = []
+    for item in cuisine_list:
+        search = re.search(r'\((.*?)\)', item[0]).group()[1:-1]
+
+        # Creates exceptions for American (New) and American (Traditional) due
+        # to their unique formatting
+        if search == "New":
+            search = "newamerican"
+        if search == "Traditional":
+            search = 'tradamerican'
+
+        cuisine_tags.append(search)
+
+    return cuisine_tags
+
+def add_restaurants(return_dict, info_list, used_cuisines, tag, city, unique_id):
+    '''
+    Given a return_dict, chunks the results into usable groups of 50, and
+    appends necessary information to info_list
+
+    Inputs:
+        - return_dict: Dictionary returned by the api call
+        - info_list: A list of lists holding restaurant information
+        - used_cuisines: A list of all cuisines already checked
+        - tag: The cuisine being searched
+        - city: The city of interest
+        - unique_id: An integer assigning a unique identifier to each entry
+
+    Returns:
+        - info_list: Updated list of lists containing restaurant information
+    '''
+
+    # Chunks and counts
+    chunk_count = (return_dict["total"] // 50) + 1
+
+    # Yelp cuts off results at 1000, so searches cannot exceed (19*50) + 50
+    if chunk_count > 19:
+        chunk_count = 19
+        
+    # Creates sub-searches based on each chunk
+    for i in range(chunk_count):
+        return_dict = yelp.search(term = "restaurant", categories = tag, 
+               location = city, limit = 50, offset = 50 * i)
+        (info_list, unique_id) = append_restaurant_info(return_dict, info_list, used_cuisines, unique_id)
+
+    return (info_list, unique_id)
 
 def append_restaurant_info(return_dict, info_list, used_cuisines, unique_id):
     '''
@@ -175,69 +241,3 @@ def append_restaurant_info(return_dict, info_list, used_cuisines, unique_id):
             print(cuisine_holding)
         
     return info_list, unique_id
-
-def find_cuisines(filepath):
-    '''
-    Reads a csv copied from yelp's category_list for v3, found here:
-    https://www.yelp.com/developers/documentation/v3/category_list
-    and converts to a usable list of string tags.
-
-    Inputs:
-        - filepath: Filepath for the location of the csv
-
-    Returns:
-        - cuisine_tags: A list of strings
-    '''
-
-    # Open csv
-    with open(filepath, 'r') as f:
-        reader = csv.reader(f)
-        cuisine_list = list(reader)
-
-    # Translate to usable form
-    cuisine_tags = []
-    for item in cuisine_list:
-        search = re.search(r'\((.*?)\)', item[0]).group()[1:-1]
-
-        # Creates exceptions for American (New) and American (Traditional) due
-        # to their unique formatting
-        if search == "New":
-            search = "newamerican"
-        if search == "Traditional":
-            search = 'tradamerican'
-
-        cuisine_tags.append(search)
-
-    return cuisine_tags
-
-def add_restaurants(return_dict, info_list, used_cuisines, tag, city, unique_id):
-    '''
-    Given a return_dict, chunks the results into usable groups of 50, and
-    appends necessary information to info_list
-
-    Inputs:
-        - return_dict: Dictionary returned by the api call
-        - info_list: A list of lists holding restaurant information
-        - used_cuisines: A list of all cuisines already checked
-        - tag: The cuisine being searched
-        - city: The city of interest
-        - unique_id: An integer assigning a unique identifier to each entry
-
-    Returns:
-        - info_list: Updated list of lists containing restaurant information
-    '''
-
-    # Chunks and counts
-    chunk_count = (return_dict["total"] // 50) + 1
-
-    # Yelp cuts off results at 1000, so searches cannot exceed (19*50) + 50
-    if chunk_count > 19:
-        chunk_count = 19
-        
-    # Creates sub-searches based on each chunk
-    for i in range(chunk_count):
-        return_dict = yelp.search(term = "restaurant", categories = tag, 
-               location = city, limit = 50, offset = 50 * i)
-        (info_list, unique_id) = append_restaurant_info(return_dict, info_list, used_cuisines, unique_id)
-
-    return (info_list, unique_id)

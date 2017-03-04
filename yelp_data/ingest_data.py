@@ -1,16 +1,22 @@
 # City CSV Aggregator
 
-# I'd like to write a function that does the following:
 '''
 This program takes all yelp_data csv results from a given folder, standardizes
 all data, reformats ID's, and appends to a single large pandas dataframe. 
 Results are also saved to a csv.
 
 Usage: Call "create_df" with default parameters, or parameters of your own
+'''
 
-Notes: 
-    - Code does not handle duplicates appearing between cities correctly
-    - Code does not currently convert data into SQL database (2 tables required)
+'''
+Note that a very small number of restaurants appear multiple times in the final
+data, because they are present in more than one city. This occurs between cities
+that are fairly close together (for example, Arlington and Washington DC), whose
+"capture radii" overlap. (This is related to the challenge discussed in the find_yelp_data.py
+notes). These cities are deliberately not removed - because comparison are being
+made between cities, it is reasonable to think that an overlapping restaurant
+might be frequented by patrons from either city, and is therefore representative
+of either city's cuisine.
 '''
 
 # Import relevant modules
@@ -53,9 +59,6 @@ def create_df(filepath = "all_restaurants.csv", city_filepath = '*.csv', initial
         unique_id = df_tuple[0]
         full_df = full_df.append(df_tuple[1], ignore_index = True)
 
-    # How to handle restaurants that are in the spheres of multiple cities?
-    # I can drop them here, but how do we decide WHICH city to drop?
-
     # Save to csv
     full_df.to_csv("filepath")
 
@@ -91,6 +94,11 @@ def find_all_cities(filepath = '*.csv'):
 def add_csv_to_df(city_name, unique_id):
     '''
     Given a csv file, adds all restaurants into a pandas dataframe.
+
+    Note that some data cleaning/reformatting is done here, based on changes
+    identified after data scraping. While some of these changes could be made to
+    the find_yelp_data.py file, doing so would then require re-scraping all data,
+    which takes upwards of a week to do (this function runs in 11 seconds)
 
     Inputs:
         - city_name: Name of the city to be added

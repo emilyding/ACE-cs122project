@@ -9,12 +9,33 @@ Each restaurant is saved with unique_id, name, cuisines, rating, price,
 To use, call find_restaurants_in_city, after supplying yelp credentials and
 saving a file destination for cuisine tags. 
 
+Note that testing this file requires creation of a Yelp Developer account (which
+is free).
+
+For smaller-scale testing of the Yelp API, a sample call has been provided below:
+f = yelp.search(term = "restaurant", price = "3", categories = "mexican", 
+            location='chicago', limit=10)
+
+f = yelp.search(term = "restaurant", location='los angeles', limit=1)
 '''
 
-# Defaults for testing
-#filepath = "yelp_cuisines.csv"
-#f = yelp.search(term = "restaurant", price = "3", categories = "mexican", location='chicago', limit=1)
-# sample_cuisines = ["afghani", "austrian"]
+'''
+Note that the "city" field returned for each restaurant is not necessarily the
+same as the input city, as neighborhoods are sometimes labelled separately. For
+example, "Chicago" restaurants labels Wicker Park as a separate "city", even though
+Wicker Park is clearly part of Chicago. At the same time, some restauarants from
+Naperville (clearly not part of Chicago) are also included. While it might be 
+tractable to choose exclusions in Chicago, where we have familiarity, it would 
+not be doable for cities like Anchorage or Seattle where no one in our group is
+familiar with the city. Exclusions could be made by finding bounaries with lat/long
+grids, but defining good outlines would be extremely time intensive, without
+guaranteeing accuracy. ('City limits' would be the only plausible measure here,
+which also isn't guaranteed to capture accurate perceptions of city locations).
+
+For this reason, these "Naperville-esque" restaurants remain in the data, although
+they represent a small minority of data.
+'''
+
 
 # Imports
 from yelp.api.v3 import Yelp
@@ -36,12 +57,15 @@ yelp = Yelp(
 
 def find_restaurants_in_city(city, filepath):
     '''
-    Finds all restauarants within a city, and creats a csv and pandas dataframe
-    with all relevant information
+    Finds all restauarants within a city (and it's nearby metropolitan area, and 
+    creates a csv and pandas dataframe with all relevant information
 
     Inputs:
         - city: The city of interest
         - filepath: Location of cuisine tag csv
+
+    Returns:
+        - A pandas dataframe
     '''
 
     # Create blank lists and set defaults
@@ -49,7 +73,6 @@ def find_restaurants_in_city(city, filepath):
     used_cuisines = []
     unique_id = 100000
     cuisine_tags = find_cuisines(filepath)
-    #cuisine_tags = ["afghani", "arabian", "burmese"]
 
     # For each cuisine tag, search all matching restaurants
     for tag in cuisine_tags:
@@ -62,6 +85,12 @@ def find_restaurants_in_city(city, filepath):
                 used_cuisines, tag, city, unique_id)
 
         # Otherwise, try to filter by price
+        # This is necessary because Yelp's "search" function cannot return more
+        # than 1000 matching entries. The funcitonality does include reliable 
+        # methods (outside lat/long sweeps) to specify ranges further in the
+        # case where filtering by price still returns more than 1000 entries.
+        # The only place this occurs is Chinese restaurants in New York
+        # Approx. ~400 of the 3,500 Chinese restauarants are excluded this way
         else:
             return_dict = yelp.search(term = "restaurant", categories = tag, 
                 price = "1", location = city, limit = 50)
@@ -96,9 +125,12 @@ def find_restaurants_in_city(city, filepath):
 
 def find_cuisines(filepath):
     '''
-    Reads a csv copied from yelp's category_list for v3, found here:
+    Reads a csv copied from Yelp's category_list for v3, found here:
     https://www.yelp.com/developers/documentation/v3/category_list
-    and converts to a usable list of string tags.
+    and converts to a usable list of string tags. Note that restaurants may
+    include cuisine tags that don't appear on this list, in the case of "hybrid"
+    restaurants (for example, several Asian restaurants are also grocery stores).
+    These tags aren't excluded.
 
     Inputs:
         - filepath: Filepath for the location of the csv
@@ -146,6 +178,8 @@ def add_restaurants(return_dict, info_list, used_cuisines, tag, city, unique_id)
     '''
 
     # Chunks and counts
+    # "Chunking" search results is necessary because the maximum valid "limit"
+    # parameter is 50, and offsetting is the only way to view subsequent results
     chunk_count = (return_dict["total"] // 50) + 1
 
     # Yelp cuts off results at 1000, so searches cannot exceed (19*50) + 50
@@ -200,6 +234,9 @@ def append_restaurant_info(return_dict, info_list, used_cuisines, unique_id):
             info_holding.append(return_dict["businesses"][i]["rating"])
 
             # Appends price, unless key is absent
+            # Unlike all other fields, which return "" for their value when info
+            # is missing, the "price" key is simply absent if pricing information
+            # is unknown
             try:
                 info_holding.append(return_dict["businesses"][i]["price"])
             except KeyError:
@@ -231,12 +268,15 @@ def append_restaurant_info(return_dict, info_list, used_cuisines, unique_id):
                 info_holding.append(return_dict["businesses"][i]["coordinates"]["longitude"])
                 info_holding.append(return_dict["businesses"][i]["coordinates"]["latitude"])
             else:
+            	# Mobile business refers to things like food stands, food trucks
+            	# or restaurants on boats
                 info_holding.append("Mobile Business")
                 info_holding.append("Mobile Business")
 
             info_list.append(info_holding)
 
             # Prints progress through city
+            # Printing "cuisine_holding" helps identify where errors occurred
             print('Finished {} Restaurant(s)'.format(len(info_list)))
             print(cuisine_holding)
         

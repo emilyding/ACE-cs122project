@@ -10,10 +10,10 @@ test_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?locatio
 
 def run_code():
     # Camille's API
-    #API = "AIzaSyCP58u53oJ_brOYoNkF0ktaCE2EyZaJIyA"
+    API = "AIzaSyCP58u53oJ_brOYoNkF0ktaCE2EyZaJIyA"
     
     # Emily's API
-    API = "AIzaSyDW15a3LCSe7J1YDRvUMWR1IsVlMxqQtRU"
+    #API = "AIzaSyDW15a3LCSe7J1YDRvUMWR1IsVlMxqQtRU"
     
     # Austin's API
     # API = "AIzaSyB28WD_QVBYhUlO3fr22uMNr2zemUA7ZyQ"
@@ -21,8 +21,8 @@ def run_code():
     full_results = []
 
     # locations dict with key city: [lat, long, radius (est.)]
-    locations = {#"Chicago": [41.881832, -87.623177, 15.297]}#,
-                "LA": [34.052235, -118.243683, 22.428]}
+    locations = {"Chicago": [41.881832, -87.623177, 15.297]}#,
+    #            "LA": [34.052235, -118.243683, 22.428]}
     #            "New York": [40.730610, -73.935242, 17.453]}
     #            "San Francisco": [37.733795, -122.446747, 6.846]}
     #            "Houston": [29.7604, -95.3698, 25.040]}
@@ -74,6 +74,7 @@ def cook_soup(API, lat, lon, stop_lat, stop_lon, start_lon):
                 loc_url = "location=" + str(lat) + "," + str(lon)
                 url = url_1 + loc_url + url_2 + API
                 request_dict = get_results(url)
+                print(request_dict["status"])
                 list_results = request_dict["results"]
                 for result in list_results:
                     name = result.get("name", None)
@@ -141,6 +142,7 @@ def cook_soup(API, lat, lon, stop_lat, stop_lon, start_lon):
                         rating = result.get("rating", None)
                         results.append([name, place_id, street, city, zipcode, price_level, rating])
                     request_num += 1
+                    
                     if "next_page_token" in request_dict:
                         request_dict = get_results(
                             "https://maps.googleapis.com/maps/api/place/nearbysearch/json?pagetoken=" 

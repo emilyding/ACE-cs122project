@@ -60,7 +60,7 @@ def create_df(filepath = "all_restaurants.csv", city_filepath = '*.csv', initial
         full_df = full_df.append(df_tuple[1], ignore_index = True)
 
     # Save to csv
-    full_df.to_csv("filepath")
+    full_df.to_csv(filepath)
 
     # Return run time
     print(time.clock() - start_time, "seconds")

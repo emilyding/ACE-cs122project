@@ -1,7 +1,7 @@
-import sys
 import sqlite3
 import csv
 import re
+import time
 
 # Need to make_two_tables(database) first to create database
 
@@ -10,7 +10,7 @@ def yelp_csv():
     Creates data table from yelp data in csv
     '''
     yelp_data = []
-    data_csv = csv.reader(open('test_data.csv', newline=''), delimiter=',')
+    data_csv = csv.reader(open('all_restaurants.csv', newline='', encoding = 'ISO-8859-1'), delimiter=',')
     
     for row in data_csv:
         yelp_data.append(row)
@@ -110,6 +110,7 @@ def get_city_ratings(output_file = "city_ratings.csv", database = "yelp_test.db"
     '''
     Get average city ratings from database for normalization, save to csv
     '''
+    start_time = time.clock()
     make_two_tables(database)
 
     connection = sqlite3.connect(database)
@@ -126,8 +127,11 @@ def get_city_ratings(output_file = "city_ratings.csv", database = "yelp_test.db"
     connection.commit()
     c.connection.close()
 
+    # Writes into the csv with name specified (default city_ratings.csv)
     with open(output_file, 'wt') as out:
         csv_out = csv.writer(out)
         csv_out.writerow(['City', 'Average Rating'])
         for row in result_table:
             csv_out.writerow(row)
+
+    print(time.clock()-start_time, "seconds")

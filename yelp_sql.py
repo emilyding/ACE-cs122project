@@ -1,6 +1,4 @@
 import sqlite3
-import itertools
-import copy 
 import csv
 import string
 import math
@@ -68,28 +66,28 @@ def get_top_cities(query, database):
     top_cities_table.sort(key=lambda x: x[1], reverse = True)
     
     if "limit" in query:
-        print("here")
-        return top_cities_table[:query["limit"]]
-        
+        return top_cities_table[:query["limit"]]     
     else:
-        print("there")
         return top_cities_table
         
     
 def get_top_cuisines(query, database):
     '''
-    Get top cuisines for a city, discounts restaurants with < 10 reviews and > 5 restaurants
+    Get top cuisines for a city (or worst if "worse" is specified), 
+    restricts to restaurants with > 10 reviews and cuisines with > 5 restaurants
+    
     Required: city name
     Optional: price ceiling, limit of # cuisines returned
 
     Inputs:
         - query (dict): maps possible queries (city, price) to list of user inputs
-          example query:
-          query = {"city": "chicago",
-                   "price": "$$$",
-                   "limit": 10}
-        - database
+          example_query = {"city": "chicago",
+                           "price": "$$$",
+                           "limit": 10,
+                           "worst": True}
+        - database name
     '''
+
     connection = sqlite3.connect(database)
     c = connection.cursor()
 
@@ -143,14 +141,63 @@ def get_top_cuisines(query, database):
         entry[1] = math.ceil(entry[1]) * "$"
 
         # Restricts to cuisines with > 5 restaurants
-        if entry[3] > 5:
-            format_price_table.append(entry)
+    #    if entry[3] > 5:
+    #        format_price_table.append(entry)
+        format_price_table.append(entry)
 
     connection.commit()
     c.connection.close()
 
     return (["Cuisine", "Price", "Rating", "# Restaurants", "Total Reviews"], format_price_table)
 
+def price_ratings(query, database):
+    '''
+    Gets avg ratings for each star category, normalized for all cities
+
+    Inputs:
+        - query (dict): maps city name to all available cuisines
+            example query:
+            query = {"city": "chicago"}
+        - database
+
+    Output:
+        - dictionary mapping dollar signs to avg ratings
+    '''
+
+    connection = sqlite3.connect(database)
+    c = connection.cursor()
+    
+    search_string = '''SELECT price, AVG(rating) as avg_rating 
+    FROM restaurant
+    WHERE city = ?
+    AND reviews > 10
+    GROUP BY price
+    '''
+    
+    params = []
+    city = query["city"]
+    params.append(city)
+
+    results = c.execute(search_string, params)
+    result_table = results.fetchall()
+
+    format_price_table = {}
+
+    for entry in result_table:
+        entry = list(entry)
+        if entry[0]:
+            # Turns price from float to $
+            entry[0] = math.ceil(float(entry[0])) * "$"
+
+            # Normalizes ratings across cities
+            entry[1] = entry[1] * city_ratings["avg"] / city_ratings[city]
+            format_price_table[entry[0]] = entry[1]
+
+
+    connection.commit()
+    c.connection.close()
+
+    return format_price_table
 
 def all_cuisines(query, database):
     '''
@@ -192,8 +239,3 @@ def all_cuisines(query, database):
     c.connection.close()
 
     return sorted(cuisine_table)
-
-
-def do_calculations(inputs):
-    words
-    return results

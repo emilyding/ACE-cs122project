@@ -2,11 +2,13 @@ import sqlite3
 import csv
 import string
 import math
+import matplotlib.pyplot as plt
 
 def get_top_cities(query, database = "yelp_adjusted.db"):
     '''
     Returns top cities for a cuisine, normalized by avg city ratings so that
     reviews across cities are comparable
+
     Inputs:
         - query (dict): maps city name to all available cuisines
             example query:
@@ -162,6 +164,17 @@ def price_ratings(query, database = "yelp_adjusted.db"):
 
     connection.commit()
     c.connection.close()
+
+    ratings = []
+    num_restaurants = []
+    for price in format_price_table:
+        ratings.append(format_price_table[price][1])
+    my_xticks = list(format_price_table.keys())
+    print(my_xticks)
+    x = [i for i in range(len(my_xticks))]
+    plt.xticks(x, my_xticks)
+    plt.plot(x, ratings, 'ro')
+    plt.show()
 
     return format_price_table
 

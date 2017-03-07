@@ -1,4 +1,5 @@
 # SQL Database Constructor
+# UPDATED
 
 '''
 This program take a csv containing Yelp data from all restaurants in all cities,
@@ -151,7 +152,9 @@ def build_database(database, yelp_data):
         price VARCHAR(5), 
         reviews INTEGER,
         phone VARCHAR(15),
-        neighborhood VARCHAR(20)
+        neighborhood VARCHAR(20),
+        lat FLOAT(25)
+        lon FLOAT(25)
         );"""
     
     create_cuisine_table = """
@@ -164,7 +167,7 @@ def build_database(database, yelp_data):
     c.execute(create_cuisine_table)
 
     # Construct strings for inserting data
-    add_restaurant_data = '''INSERT INTO restaurant VALUES (?, ?, ?, ?, ?, ?, ?, ?)'''
+    add_restaurant_data = '''INSERT INTO restaurant VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
     add_cuisine_data = '''INSERT INTO cuisines VALUES (?, ?)'''
 
     restaurant_sql = []
@@ -182,6 +185,8 @@ def build_database(database, yelp_data):
         restaurant_entry.append(entry[7]) #Review Count
         restaurant_entry.append(entry[11]) # Phone
         restaurant_entry.append(entry[8]) # Neighborhood
+        restaurant_entry.append(entry[12]) # Latitude
+        restaurant_entry.append(entry[13]) # Longitude
 
         restaurant_sql.append(restaurant_entry)
         

@@ -27,7 +27,7 @@ def go(output_file = "city_ratings.csv", database1 = "yelp_raw.db",
     Inputs: 
         - output_file: The name of the csv to save average reviews per city to
         - database1: The name of the SQL database for unadjusted data
-        - database1: The name of the SQL database for adjusted data
+        - database2: The name of the SQL database for adjusted data
         - source_file: The name of the csv where yelp data is located
     '''
 
@@ -41,16 +41,18 @@ def go(output_file = "city_ratings.csv", database1 = "yelp_raw.db",
     # Constructs csv of city ratings
     result_table = get_city_ratings(output_file, database1)
 
-    # Finds a linear adjustment factor for each city
-    avg_review = mean(j for i, j in result_table)
+    # Finds the adjustment factor for each city to standardize across cities
+    # Note: multiplying by factor as opposed to linear adjustment allows accounting
+    # for possible differences in use of the range of reviews
+    avg_review = mean(city_avg for city_name, city_avg in result_table)
     adjustment_rates = {}
     for city in result_table:
-        adjustment_rates[city[0]] = avg_review - city[1]
+        adjustment_rates[city[0]] = avg_review / city[1]
 
     # Adjusts the rating of each restaurant in the data
     # (Yelp reports rating as a string, so it must first be converted to a float)
     for item in yelp_data:
-        item[5] = float(item[5]) + adjustment_rates[item[2]]
+        item[5] = float(item[5]) * adjustment_rates[item[2]]
 
     # Builds the second database, with adjusted restaurant review numbers
     build_database(database2, yelp_data)

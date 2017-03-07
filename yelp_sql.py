@@ -3,40 +3,21 @@ import csv
 import string
 import math
 
-def get_city_ratings(city_ratings_file = "city_ratings.csv"):
-    '''
-    Gets average city ratings from csv file. NOTE: must run get_city_ratings
-    from yelp_constants.py
-    '''
-    city_ratings = {}
-    data_csv = csv.reader(open(city_ratings_file, newline=''), delimiter=',')
-    all_city_rating = 0
-    
-    for index, row in enumerate(data_csv):
-        if index != 0:
-            city_ratings[row[0]] = float(row[1])
-            all_city_rating = all_city_rating + float(row[1])
-
-    all_city_rating = all_city_rating / len(city_ratings.keys())
-    city_ratings["avg"] = all_city_rating
-
-    return city_ratings
-
-city_ratings = get_city_ratings("city_ratings.csv")
-
-
 def get_top_cities(query, database):
     '''
     Returns top cities for a cuisine, normalized by avg city ratings so that
     reviews across cities are comparable
+    Inputs:
+        - query (dict): maps city name to all available cuisines
+            example query:
+            query = {"cuisine": "Mexico"}
     '''
-    # Dict mapping city names to avg city ratings
-    city_ratings
 
     connection = sqlite3.connect(database)
     c = connection.cursor()
     
-    search_string = '''SELECT city, AVG(rating) as avg_rating 
+    search_string = '''SELECT city, AVG(rating) as avg_rating, 
+    COUNT(*) as num_restaurants 
     FROM restaurant
     JOIN cuisines
     ON restaurant.id = cuisines.id
@@ -54,27 +35,18 @@ def get_top_cities(query, database):
     connection.commit()
     c.connection.close()
 
-    top_cities_table = []
-
-    for row in result_table:
-        row = list(row)
-
-        # Normalizes ratings across cities
-        row[1] = row[1] * city_ratings["avg"] / city_ratings[row[0]]
-        top_cities_table.append(row)
-    
-    top_cities_table.sort(key=lambda x: x[1], reverse = True)
+    result_table.sort(key = lambda x: x[1], reverse = True)
     
     if "limit" in query:
-        return top_cities_table[:query["limit"]]     
+        return result_table[:query["limit"]]
     else:
-        return top_cities_table
+        return result_table
         
     
 def get_top_cuisines(query, database):
     '''
     Get top cuisines for a city (or worst if "worse" is specified), 
-    restricts to restaurants with > 10 reviews and cuisines with > 5 restaurants
+    restricts to restaurants with >= 5 reviews and cuisines with >= 5 restaurants
     
     Required: city name
     Optional: price ceiling, limit of # cuisines returned
@@ -97,7 +69,6 @@ def get_top_cuisines(query, database):
     JOIN cuisines
     ON restaurant.id = cuisines.id
     WHERE city = ?
-    AND reviews > 10
     '''
     
     params = []
@@ -109,7 +80,6 @@ def get_top_cuisines(query, database):
     if "price" in query:
         search_string += '''AND price <= ?'''
         price_length = len(query["price"])
-        print(price_length)
         params.append(price_length)
 
     if "worst" in query:
@@ -141,9 +111,8 @@ def get_top_cuisines(query, database):
         entry[1] = math.ceil(entry[1]) * "$"
 
         # Restricts to cuisines with > 5 restaurants
-    #    if entry[3] > 5:
-    #        format_price_table.append(entry)
-        format_price_table.append(entry)
+        if entry[3] > 5:
+            format_price_table.append(entry)
 
     connection.commit()
     c.connection.close()
@@ -152,10 +121,10 @@ def get_top_cuisines(query, database):
 
 def price_ratings(query, database):
     '''
-    Gets avg ratings for each star category, normalized for all cities
+    Gets avg ratings for each star category for a city, normalized
 
     Inputs:
-        - query (dict): maps city name to all available cuisines
+        - query (dict): contains desired city name
             example query:
             query = {"city": "chicago"}
         - database

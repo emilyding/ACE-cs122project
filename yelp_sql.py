@@ -136,7 +136,8 @@ def price_ratings(query, database = "yelp_adjusted.db"):
     connection = sqlite3.connect(database)
     c = connection.cursor()
     
-    search_string = '''SELECT price, AVG(rating) as avg_rating 
+    search_string = '''SELECT price, AVG(rating) as avg_rating, 
+    COUNT(*) as num_restaurants 
     FROM restaurant
     WHERE city = ?
     COLLATE nocase
@@ -154,11 +155,10 @@ def price_ratings(query, database = "yelp_adjusted.db"):
     format_price_table = {}
 
     for entry in result_table:
-        entry = list(entry)
         if entry[0]:
             # Turns price from float to $
-            entry[0] = math.ceil(float(entry[0])) * "$"
-            format_price_table[entry[0]] = entry[1]
+            price = math.ceil(float(entry[0])) * "$"
+            format_price_table[price] = [entry[1], entry[2]]
 
     connection.commit()
     c.connection.close()

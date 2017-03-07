@@ -130,7 +130,7 @@ def price_ratings(query, database = "yelp_adjusted.db"):
         - database
 
     Output:
-        - dictionary mapping dollar signs to avg ratings
+        - dictionary mapping dollar signs to list [avg rating, # restaurants]
     '''
 
     connection = sqlite3.connect(database)

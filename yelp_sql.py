@@ -3,7 +3,7 @@ import csv
 import string
 import math
 
-def get_top_cities(query, database):
+def get_top_cities(query, database = "yelp_adjusted.db"):
     '''
     Returns top cities for a cuisine, normalized by avg city ratings so that
     reviews across cities are comparable
@@ -22,6 +22,7 @@ def get_top_cities(query, database):
     JOIN cuisines
     ON restaurant.id = cuisines.id
     WHERE cuisines.cuisine = ?
+    COLLATE NOCASE
     GROUP BY city
     '''
     
@@ -43,7 +44,7 @@ def get_top_cities(query, database):
         return result_table
         
     
-def get_top_cuisines(query, database):
+def get_top_cuisines(query, database = "yelp_adjusted.db"):
     '''
     Get top cuisines for a city (or worst if "worse" is specified), 
     restricts to restaurants with >= 5 reviews and cuisines with >= 5 restaurants
@@ -69,6 +70,7 @@ def get_top_cuisines(query, database):
     JOIN cuisines
     ON restaurant.id = cuisines.id
     WHERE city = ?
+    COLLATE NOCASE
     '''
     
     params = []
@@ -119,7 +121,7 @@ def get_top_cuisines(query, database):
 
     return (["Cuisine", "Price", "Rating", "# Restaurants", "Total Reviews"], format_price_table)
 
-def price_ratings(query, database):
+def price_ratings(query, database = "yelp_adjusted.db"):
     '''
     Gets avg ratings for each star category for a city, normalized
 
@@ -141,6 +143,7 @@ def price_ratings(query, database):
     WHERE city = ?
     AND reviews > 10
     GROUP BY price
+    COLLATE NOCASE
     '''
     
     params = []
@@ -162,13 +165,12 @@ def price_ratings(query, database):
             entry[1] = entry[1] * city_ratings["avg"] / city_ratings[city]
             format_price_table[entry[0]] = entry[1]
 
-
     connection.commit()
     c.connection.close()
 
     return format_price_table
 
-def all_cuisines(query, database):
+def all_cuisines(query, database = "yelp_adjusted.db"):
     '''
     Get all cuisine types for a city from database
 
@@ -190,6 +192,7 @@ def all_cuisines(query, database):
     JOIN restaurant
     ON restaurant.id = cuisines.id
     WHERE city = ?
+    COLLATE NOCASE
     '''
     
     params = []

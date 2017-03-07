@@ -27,7 +27,7 @@ def go(output_file = "city_ratings.csv", database1 = "yelp_raw.db",
     Inputs: 
         - output_file: The name of the csv to save average reviews per city to
         - database1: The name of the SQL database for unadjusted data
-        - database2: The name of the SQL database for adjusted data
+        - database2: The name of the SQL database for adjusted data (normalized across cities)
         - source_file: The name of the csv where yelp data is located
     '''
 
@@ -61,8 +61,6 @@ def go(output_file = "city_ratings.csv", database1 = "yelp_raw.db",
     get_city_ratings("city_ratings_adjusted.csv", database2)
 
     print(time.clock() - start_time, "seconds")
-
-    #return result_table
 
 def yelp_csv(source_file):
     '''

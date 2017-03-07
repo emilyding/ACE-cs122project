@@ -9,19 +9,20 @@ test_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?locatio
 #url = "https://www.zagat.com/r/goosefoot-chicago"
 
 run_number = 1
-# Camille's API
+# Camille's API key
 #API = "AIzaSyCP58u53oJ_brOYoNkF0ktaCE2EyZaJIyA"
 
-# Emily's API
+# Emily's API key
 # API = "AIzaSyDW15a3LCSe7J1YDRvUMWR1IsVlMxqQtRU"
 
-# Austin's API
+# Austin's API key
 #API = "AIzaSyB28WD_QVBYhUlO3fr22uMNr2zemUA7ZyQ"
 
-# Fourth API
+# Fourth API key
 # API = "AIzaSyDLWHjPZycWPeYui9yg2AM0own1IaVHIFc"
 
-API = "AIzaSyCkSm8tFiiEFSoXc9ixXNLlMD0N3O52sno"
+# Fifth API key
+# API = "AIzaSyCkSm8tFiiEFSoXc9ixXNLlMD0N3O52sno"
 
 def run_code():
     full_results = []
@@ -32,10 +33,14 @@ def run_code():
     #            "San Francisco": [37.733795, -122.446747, 6.846]}
     #            "Houston": [29.7604, -95.3698, 25.040]}
 
+    # Uncomment in first run to add headers to csv
     #with open (csv_name + ".csv",'a') as filedata:                            
     #    writer = csv.writer(filedata, delimiter=',')
     #    writer.writerow(["name", "place_id", "street address", "city", "zipcode", "price_level", "rating", "latitude", "longitude"])
 
+    # Theoretically, code should loop over cities and pull data. However, due to constantly having
+    # to change API keys mid-city, and inconsistencies in when the API keys stop working, functionally
+    # this only works with manual runs.
     for city in locations:
         city_name = city
         info = locations[city]
@@ -53,7 +58,7 @@ def run_code():
 
         csv_name = "zagat_" + city_name + "_" + str(run_number)
 
-        data, lat, lon = cook_soup(
+        data, lat, lon = city_search(
             API, lat, lon, stop_lat, stop_lon, start_lon, csv_name)
         full_results = full_results + data
 
@@ -63,7 +68,7 @@ def run_code():
 
     return (city_name, lat, lon)
 
-def cook_soup(API, lat, lon, stop_lat, stop_lon, start_lon, csv_name):
+def city_search(API, lat, lon, stop_lat, stop_lon, start_lon, csv_name):
     '''
     Pull restaurant data from a Nearby Search in Google Maps, write to csv
     '''

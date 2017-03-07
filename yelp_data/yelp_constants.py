@@ -153,7 +153,7 @@ def build_database(database, yelp_data):
         reviews INTEGER,
         phone VARCHAR(15),
         neighborhood VARCHAR(20),
-        lat FLOAT(25)
+        lat FLOAT(25),
         lon FLOAT(25)
         );"""
     
@@ -182,7 +182,7 @@ def build_database(database, yelp_data):
             restaurant_entry.append("")
         else:
             restaurant_entry.append(len(price))
-        restaurant_entry.append(entry[7]) #Review Count
+        restaurant_entry.append(entry[7]) # Review Count
         restaurant_entry.append(entry[11]) # Phone
         restaurant_entry.append(entry[8]) # Neighborhood
         restaurant_entry.append(entry[12]) # Latitude

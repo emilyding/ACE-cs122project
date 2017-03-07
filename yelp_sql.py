@@ -84,22 +84,9 @@ def get_top_cuisines(query, database = "yelp_adjusted.db"):
         price_length = len(query["price"])
         params.append(price_length)
 
-    if "worst" in query:
-        search_string += '''GROUP BY cuisine
-        ORDER BY rating ASC
-        '''
-
-    else:
-        search_string += '''GROUP BY cuisine
-        ORDER BY rating DESC
-        '''
-
-    # If user wanted top n results, limits # results to n
-    if "limit" in query:
-        search_string += '''LIMIT ?;'''
-        params.append(query["limit"])
-    else:
-        search_string += ''';'''
+    search_string += '''
+    GROUP BY cuisine;
+    '''
     
     results = c.execute(search_string, params)
     result_table = results.fetchall()
@@ -116,8 +103,19 @@ def get_top_cuisines(query, database = "yelp_adjusted.db"):
         if entry[3] > 5:
             format_price_table.append(entry)
 
+    if "worst" in query:
+        format_price_table.sort(key = lambda x: x[2])
+
+    else:
+        format_price_table.sort(key = lambda x: x[2], reverse = True)
+
     connection.commit()
     c.connection.close()
+
+    
+    # If user wanted top n results, limits # results to n
+    if "limit" in query:
+        format_price_table = format_price_table[:query["limit"]]
 
     return (["Cuisine", "Price", "Rating", "# Restaurants", "Total Reviews"], format_price_table)
 
@@ -141,9 +139,9 @@ def price_ratings(query, database = "yelp_adjusted.db"):
     search_string = '''SELECT price, AVG(rating) as avg_rating 
     FROM restaurant
     WHERE city = ?
+    COLLATE nocase
     AND reviews > 10
     GROUP BY price
-    COLLATE NOCASE
     '''
     
     params = []
@@ -160,9 +158,6 @@ def price_ratings(query, database = "yelp_adjusted.db"):
         if entry[0]:
             # Turns price from float to $
             entry[0] = math.ceil(float(entry[0])) * "$"
-
-            # Normalizes ratings across cities
-            entry[1] = entry[1] * city_ratings["avg"] / city_ratings[city]
             format_price_table[entry[0]] = entry[1]
 
     connection.commit()

@@ -198,7 +198,10 @@ def build_database(database, yelp_data):
 
         for cuisine_type in result:
             cuisine_type.strip(" \'")
-            cuisine_sql.append([entry[1], cuisine_type[1:-1]])
+            if cuisine_type == "Wine&Spirits'":
+                cuisine_sql.append([entry[1], "Wine&Spirits"])
+            elif cuisine_type != "Women'sClothing":
+                cuisine_sql.append([entry[1], cuisine_type[1:-1]])
 
     c.executemany(add_restaurant_data, restaurant_sql)
     c.executemany(add_cuisine_data, cuisine_sql)

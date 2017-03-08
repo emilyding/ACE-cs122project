@@ -10,13 +10,13 @@ test_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?locatio
 
 run_number = 1
 # Camille's API key
-#API = "AIzaSyCP58u53oJ_brOYoNkF0ktaCE2EyZaJIyA"
+API = "AIzaSyCP58u53oJ_brOYoNkF0ktaCE2EyZaJIyA"
 
 # Emily's API key
 # API = "AIzaSyDW15a3LCSe7J1YDRvUMWR1IsVlMxqQtRU"
 
 # Austin's API key
-#API = "AIzaSyB28WD_QVBYhUlO3fr22uMNr2zemUA7ZyQ"
+# API = "AIzaSyB28WD_QVBYhUlO3fr22uMNr2zemUA7ZyQ"
 
 # Fourth API key
 # API = "AIzaSyDLWHjPZycWPeYui9yg2AM0own1IaVHIFc"
@@ -49,9 +49,9 @@ def run_code():
         radius_deg = info[2] / 69
         
         #lat = info[0] - radius_deg # COMMENT OUT IF MID CITY
-        lat = 41.910136347826036# UNCOMMENT IF MID CITY, manually input last stopping point
+        lat = 41.970136347826036# UNCOMMENT IF MID CITY, manually input last stopping point
         #lon = info[1] - radius_deg # COMMENT OUT IF MID CITY
-        lon = -87.80487265217385# UNCOMMENT IF MID CITY, manually input last stopping point
+        lon = -87.73487265217385# UNCOMMENT IF MID CITY, manually input last stopping point
         start_lon = info[1] - radius_deg
         stop_lat = info[0] + radius_deg
         stop_lon = info[1] + radius_deg

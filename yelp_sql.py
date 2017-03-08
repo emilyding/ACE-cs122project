@@ -57,7 +57,7 @@ def get_top_cities(query, database = "yelp_adjusted.db"):
         return result_table[:10]
         
     
-def get_top_cuisines(query, database = "yelp_adjusted.db"):
+def get_top_cuisines(query, database = "yelp_raw.db"):
     '''
     Get top cuisines for a city (or worst if "worse" is specified), 
     restricts to restaurants with >= 5 reviews and cuisines with >= 5 restaurants
@@ -144,9 +144,9 @@ def get_top_cuisines(query, database = "yelp_adjusted.db"):
         format_price_table)
 
 
-def price_ratings(query, database = "yelp_adjusted.db"):
+def price_ratings(query, database = "yelp_raw.db"):
     '''
-    Gets normalized avg ratings for each price category for a city
+    Gets avg ratings for each price category for a city
     Creates and saves two plots: graph of avg ratings by price category, pie chart
     showing number of restaurants in each price category
 

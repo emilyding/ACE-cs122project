@@ -137,6 +137,7 @@ def find_median_min_distance(points):
             path = results[0].item(1)
             min_distances.append(path)
 
+
     return median(min_distances)
 
 

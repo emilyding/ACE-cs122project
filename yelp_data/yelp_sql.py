@@ -86,6 +86,7 @@ def get_top_cities(query, database = "yelp_adjusted.db"):
     fig, ax = plt.subplots(figsize=(12, 5)) # set size frame
     ax.xaxis.set_visible(False)  # hide the x axis
     ax.yaxis.set_visible(False)  # hide the y axis
+    ax.set_frame_on(False)
     tabla = table(ax, result_frame, loc='center', colWidths=[0.17]*len(result_frame.columns))  # where df is your data frame
     tabla.auto_set_font_size(False) # Activate set fontsize manually
     tabla.set_fontsize(12) # if ++fontsize is necessary ++colWidths
@@ -100,7 +101,7 @@ def get_top_cities(query, database = "yelp_adjusted.db"):
 def get_top_cuisines(query, database = "yelp_raw.db"):
     '''
     Get top cuisines for a city (or worst if "worse" is specified), 
-    restricts to restaurants with >= 5 reviews and cuisines with >= 5 restaurants
+    restricts to restaurants with >= 5 reviews and cuisines with >= 10 restaurants
     
     Required: city name
     Optional: price ceiling, limit of # cuisines returned (default 10), worst (boolean specifying
@@ -149,12 +150,15 @@ def get_top_cuisines(query, database = "yelp_raw.db"):
     results = c.execute(search_string, params)
     result_table = results.fetchall()
 
+    connection.commit()
+    c.connection.close()
+
     if "worst" in query and query["worst"]:
         result_table.sort(key = lambda x: x[2])
     else:
         result_table.sort(key = lambda x: x[2], reverse = True)
 
-    # Formats prices and ensures cuisines have > 5 restaurants
+    # Formats prices and ensures cuisines have > 10 restaurants
     format_price_table = []
     
     if "limit" in query:
@@ -162,26 +166,69 @@ def get_top_cuisines(query, database = "yelp_raw.db"):
     else:
         limit = 10
     count = 0
-
+    
     for entry in result_table:
         if count < limit:
             # Turns prices from floats (rounded up since they will always be capped by 
             # price ceiling) to dollar sign characters
             entry = list(entry)
-            entry[1] = math.ceil(entry[1]) * "$"
+            entry[1] = math.ceil(entry[1]) * "\$"
 
-            # Restricts to cuisines with > 5 restaurants
-            if entry[3] > 5:
-                special = special_cuisine(entry[0], entry[2])
+            # Restricts to cuisines with > 10 restaurants
+            if entry[3] > 10:
+                # Get relative rating compared to other cities
+                sd, mean = special_cuisine(entry[0])
+                if math.fabs(entry[2] - mean) <= sd:
+                    special = "average"
+                elif entry[2] - mean > 0:
+                    special = "good"
+                else:
+                    special = "bad"
                 entry.append(special)
                 format_price_table.append(entry)
                 count += 1
+        else:
+            break
 
-    connection.commit()
-    c.connection.close()
+    result_frame = pd.DataFrame(format_price_table, 
+        columns=["Cuisine", "Price", "Rating", "# Restaurants", "Total Reviews", "All Cities Comparison"])
+    result_frame = result_frame.round(2)
+    result_frame["Cuisine"] = result_frame["Cuisine"].str.title() # Capitalize city names
+    length = len(result_frame.index)
 
-    return (["Cuisine", "Price", "Rating", "# Restaurants", "Total Reviews", "Relative Rating"], 
-        format_price_table)
+    # Creates bar chart of normalized ratings for top cities
+    low = result_frame["Rating"].min() - .2
+    high = result_frame["Rating"].max() + .2
+    plt.ylim(low, high)
+
+    x = [i for i in range(length)]
+    plt.xlim(min(x) - .1, max(x) + .9)
+    plt.bar(x, result_frame["Rating"])
+    plt.xticks(x, result_frame["Cuisine"], rotation = 16)
+
+    plt.ylabel('Rating')
+    plt.title('Top Cuisines for ' + city.title())
+    
+    # Saves plot to top_cities_cuisine.png
+    plt.savefig('top_cuisines_' + city + '.png')
+    plt.close("all")
+    
+    result_frame.index = [i + 1 for i in range(length)]
+
+    fig, ax = plt.subplots(figsize=(12, 5)) # set size frame
+    ax.xaxis.set_visible(False)  # hide the x axis
+    ax.yaxis.set_visible(False)  # hide the y axis
+    ax.set_frame_on(False)
+    tabla = table(ax, result_frame, loc='center', colWidths=[0.17]*len(result_frame.columns))  # where df is your data frame
+    tabla.auto_set_font_size(False) # Activate set fontsize manually
+    tabla.set_fontsize(12) # if ++fontsize is necessary ++colWidths
+    tabla.scale(1.2, 1.2) # change size table
+
+    plt.savefig(city + "_table.png")
+    plt.show()
+    plt.close("all")
+
+    return result_frame
 
 
 def price_ratings(query, database = "yelp_raw.db"):
@@ -197,7 +244,7 @@ def price_ratings(query, database = "yelp_raw.db"):
         - database
 
     Output:
-        - dictionary mapping dollar signs to list [avg rating, # restaurants]
+        - list of lists: [price, avg rating, # restaurants]
         - price_ratings_city.png
         - price_restaurants_city.png
     '''
@@ -278,7 +325,7 @@ def price_ratings(query, database = "yelp_raw.db"):
 
 def all_cuisines(query, database = "yelp_adjusted.db"):
     '''
-    Get all cuisine types with >= 5 restaurants for a city from database
+    Get all cuisine types with >= 10 restaurants for a city from database
 
     Inputs:
         - query (dict): maps city name to all available cuisines
@@ -313,7 +360,7 @@ def all_cuisines(query, database = "yelp_adjusted.db"):
     # Take out of form [("cuisine",)] to form ['cuisine']
     for result in result_table:
         print(result)
-        if result[1] > 4:
+        if result[1] >= 10:
             cuisine_table.append(result[0])
 
     connection.commit()
@@ -321,7 +368,7 @@ def all_cuisines(query, database = "yelp_adjusted.db"):
 
     return sorted(cuisine_table)
 
-def special_cuisine(cuisine, rating, database = "yelp_adjusted.db"):
+def special_cuisine(cuisine, database = "yelp_adjusted.db"):
     '''
     Returns a value measuring whether a cuisine is unusually highly/lowly
     rated based on data from other cities
@@ -352,11 +399,5 @@ def special_cuisine(cuisine, rating, database = "yelp_adjusted.db"):
 
     sd = stat.stdev(ratings_table)
     mean = stat.mean(ratings_table)
-    if math.fabs(rating - mean) <= sd:
-        color = "average"
-    elif rating - mean > 0:
-        color = "good"
-    else:
-        color = "below"
 
-    return color
+    return sd, mean

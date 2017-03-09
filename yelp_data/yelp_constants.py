@@ -1,4 +1,5 @@
 # SQL Database Constructor
+# UPDATED
 
 '''
 This program take a csv containing Yelp data from all restaurants in all cities,
@@ -27,7 +28,7 @@ def go(output_file = "city_ratings.csv", database1 = "yelp_raw.db",
     Inputs: 
         - output_file: The name of the csv to save average reviews per city to
         - database1: The name of the SQL database for unadjusted data
-        - database1: The name of the SQL database for adjusted data
+        - database2: The name of the SQL database for adjusted data (normalized across cities)
         - source_file: The name of the csv where yelp data is located
     '''
 
@@ -41,16 +42,18 @@ def go(output_file = "city_ratings.csv", database1 = "yelp_raw.db",
     # Constructs csv of city ratings
     result_table = get_city_ratings(output_file, database1)
 
-    # Finds a linear adjustment factor for each city
-    avg_review = mean(j for i, j in result_table)
+    # Finds the adjustment factor for each city to standardize across cities
+    # Note: multiplying by factor as opposed to linear adjustment allows accounting
+    # for possible differences in use of the range of reviews
+    avg_review = mean(city_avg for city_name, city_avg in result_table)
     adjustment_rates = {}
     for city in result_table:
-        adjustment_rates[city[0]] = avg_review - city[1]
+        adjustment_rates[city[0]] = avg_review / city[1]
 
     # Adjusts the rating of each restaurant in the data
     # (Yelp reports rating as a string, so it must first be converted to a float)
     for item in yelp_data:
-        item[5] = float(item[5]) + adjustment_rates[item[2]]
+        item[5] = float(item[5]) * adjustment_rates[item[2]]
 
     # Builds the second database, with adjusted restaurant review numbers
     build_database(database2, yelp_data)
@@ -59,8 +62,6 @@ def go(output_file = "city_ratings.csv", database1 = "yelp_raw.db",
     get_city_ratings("city_ratings_adjusted.csv", database2)
 
     print(time.clock() - start_time, "seconds")
-
-    #return result_table
 
 def yelp_csv(source_file):
     '''
@@ -151,7 +152,9 @@ def build_database(database, yelp_data):
         price VARCHAR(5), 
         reviews INTEGER,
         phone VARCHAR(15),
-        neighborhood VARCHAR(20)
+        neighborhood VARCHAR(20),
+        lat FLOAT(25),
+        lon FLOAT(25)
         );"""
     
     create_cuisine_table = """
@@ -164,7 +167,7 @@ def build_database(database, yelp_data):
     c.execute(create_cuisine_table)
 
     # Construct strings for inserting data
-    add_restaurant_data = '''INSERT INTO restaurant VALUES (?, ?, ?, ?, ?, ?, ?, ?)'''
+    add_restaurant_data = '''INSERT INTO restaurant VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
     add_cuisine_data = '''INSERT INTO cuisines VALUES (?, ?)'''
 
     restaurant_sql = []
@@ -179,9 +182,11 @@ def build_database(database, yelp_data):
             restaurant_entry.append("")
         else:
             restaurant_entry.append(len(price))
-        restaurant_entry.append(entry[7]) #Review Count
+        restaurant_entry.append(entry[7]) # Review Count
         restaurant_entry.append(entry[11]) # Phone
         restaurant_entry.append(entry[8]) # Neighborhood
+        restaurant_entry.append(entry[12]) # Latitude
+        restaurant_entry.append(entry[13]) # Longitude
 
         restaurant_sql.append(restaurant_entry)
         
@@ -193,7 +198,10 @@ def build_database(database, yelp_data):
 
         for cuisine_type in result:
             cuisine_type.strip(" \'")
-            cuisine_sql.append([entry[1], cuisine_type[1:-1]])
+            if cuisine_type == "Wine&Spirits'":
+                cuisine_sql.append([entry[1], "Wine&Spirits"])
+            elif cuisine_type != "Women'sClothing":
+                cuisine_sql.append([entry[1], cuisine_type[1:-1]])
 
     c.executemany(add_restaurant_data, restaurant_sql)
     c.executemany(add_cuisine_data, cuisine_sql)

@@ -5,6 +5,8 @@ import math
 import matplotlib.pyplot as plt
 import statistics as stat
 import numpy as np
+import pandas as pd
+from pandas.tools.plotting import table
 
 def get_top_cities(query, database = "yelp_adjusted.db"):
     '''
@@ -57,27 +59,20 @@ def get_top_cities(query, database = "yelp_adjusted.db"):
     else:
         result_table = result_table[:10]
 
-    city_names = []
-    ratings = []
-    table = []
-
-    for index, result in enumerate(result_table):
-        result_table[index] = list(result_table)
-        city_names.append(result[0].title())
-        ratings.append(result[1])
-        result = list(result)
-        result[0] = result[0].title()
-        table.append(result)
+    result_frame = pd.DataFrame(result_table, columns=["City", "Rating", "# Restaurants"])
+    result_frame = result_frame.round(2)
+    result_frame["City"] = result_frame["City"].str.title() # Capitalize city names
+    length = len(result_frame.index)
 
     # Creates bar chart of normalized ratings for top cities
-    low = min(ratings) - .2
-    high = max(ratings) + .2
+    low = result_frame["Rating"].min() - .2
+    high = result_frame["Rating"].max() + .2
     plt.ylim(low, high)
 
-    x = [i for i in range(len(city_names))]
+    x = [i for i in range(length)]
     plt.xlim(min(x) - .1, max(x) + .9)
-    plt.bar(x, ratings)
-    plt.xticks(x, city_names, rotation = 20)
+    plt.bar(x, result_frame["Rating"])
+    plt.xticks(x, result_frame["City"], rotation = 20)
 
     plt.ylabel('Rating')
     plt.title('Top Cities for ' + cuisine.title())
@@ -86,25 +81,20 @@ def get_top_cities(query, database = "yelp_adjusted.db"):
     plt.savefig('top_cities_' + cuisine + '.png')
     plt.close()
 
-    # Create formatted table
-#    fig, axs = plt.subplots(2,1)
-#    axs[0].axis('tight')
-#    axs[0].axis('off')
+    result_frame.index = [i + 1 for i in range(length)]
 
-#    axs[1].plot(clust_data[:,0],clust_data[:,1])
+    fig, ax = plt.subplots(figsize=(12, 5)) # set size frame
+    ax.xaxis.set_visible(False)  # hide the x axis
+    ax.yaxis.set_visible(False)  # hide the y axis
+    tabla = table(ax, result_frame, loc='center', colWidths=[0.17]*len(result_frame.columns))  # where df is your data frame
+    tabla.auto_set_font_size(False) # Activate set fontsize manually
+    tabla.set_fontsize(12) # if ++fontsize is necessary ++colWidths
+    tabla.scale(1.2, 1.2) # change size table
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax.xaxis.set_visible(False)
-    ax.yaxis.set_visible(False)
-    colLabels=("City", "Rating", "# Restaurants")
-    the_table = ax.table(cellText = table,
-              colLabels = colLabels,
-              loc='center')
     plt.savefig(cuisine + "_table.png")
-    plt.show()
+    plt.close()
 
-    return table
+    return result_frame
         
     
 def get_top_cuisines(query, database = "yelp_raw.db"):
@@ -226,41 +216,50 @@ def price_ratings(query, database = "yelp_raw.db"):
     
     params = []
     city = query["city"]
-    print(city)
     params.append(city)
 
     results = c.execute(search_string, params)
     result_table = results.fetchall()
 
-    format_price_table = {}
+    format_price_table = []
 
     for entry in result_table:
         if entry[0]:
             # Turns price from float to $
             price = math.ceil(float(entry[0])) * "$"
-            format_price_table[price] = [entry[1], entry[2]]
+            format_price_table.append([price, entry[1], entry[2]])
 
     connection.commit()
     c.connection.close()
 
-    prices = []
-    ratings = []
-    num_restaurants = []
-    total = 0
-    price_keys = sorted(format_price_table.keys())
+    result_frame = pd.DataFrame(format_price_table, columns=["Price", "Rating", "# Restaurants"])
+    result_frame = result_frame.round(2)
+    length = len(result_frame.index)
+
+    # Creates bar chart of normalized ratings for top cities
+    low = result_frame["Rating"].min() - .2
+    high = result_frame["Rating"].max() + .2
+    plt.ylim(low, high)
+
+#    prices = []
+#    ratings = []
+#    num_restaurants = []
+#    total = 0
+#    price_keys = sorted(format_price_table.keys())
     
-    for price in price_keys:
-        prices.append(price)
-        ratings.append(format_price_table[price][0])
-        num_restaurants.append(format_price_table[price][1])
-        total += format_price_table[price][1]
+#    for price in price_keys:
+#        prices.append(price)
+#        ratings.append(format_price_table[price][0])
+#        num_restaurants.append(format_price_table[price][1])
+#        total += format_price_table[price][1]
 
     # Visualizes price to ratings graph
     plt.xlabel('Price')
     plt.ylabel('Avg Rating')
-    plt.title('Price to Ratings in ' + query["city"].capitalize())
+    plt.title('Price to Ratings in ' + query["city"].title())
+    total = result_frame["Rating"].sum()
 
-    max_price = len(format_price_table.keys())
+    max_price = length
     x_ticks = []
 
     # Creates $ labels (if not escaped with \, creates error)
@@ -270,8 +269,8 @@ def price_ratings(query, database = "yelp_raw.db"):
     x = [i + 1 for i in range(max_price)]
 
     plt.xticks(x, x_ticks)
-    plt.plot(x, ratings, 'ro')
-    plt.axis([0, 5, min(ratings) - .1, max(ratings) + .1])
+    plt.plot(x, result_frame["Rating"], 'ro')
+    plt.axis([0, 5, result_frame["Rating"].min() - .1, result_frame["Rating"].max() + .1])
 
     # Saves price to ratings graph for "city" as "price_ratings_city.png"
     plt.savefig('price_ratings_' + query["city"].replace(' ', '').lower() + '.png')
@@ -279,11 +278,11 @@ def price_ratings(query, database = "yelp_raw.db"):
 
     # Visualizes number of restaurants per price bracket as a pie graph
     colors = ['gold', 'yellowgreen', 'lightcoral', 'lightskyblue']
-    plt.pie(num_restaurants, labels=x_ticks, colors=colors, 
+    plt.pie(result_frame["# Restaurants"], labels=x_ticks, colors=colors, 
         autopct=lambda p: '{:.0f}'.format(p * total / 100), startangle=0)
     plt.axis('equal')
 
-    # Saves price to num_restaurants for "city" as "price_restaurants_city.png"
+    # Saves price to num_restaurants graph asfor "city" as "price_restaurants_city.png"
     plt.savefig('price_restaurants_' + query["city"].replace(' ', '').lower() + '.png')
     plt.close('all')
 

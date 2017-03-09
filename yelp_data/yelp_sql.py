@@ -4,6 +4,7 @@ import string
 import math
 import matplotlib.pyplot as plt
 import statistics as stat
+import numpy as np
 
 def get_top_cities(query, database = "yelp_adjusted.db"):
     '''
@@ -50,11 +51,57 @@ def get_top_cities(query, database = "yelp_adjusted.db"):
     c.connection.close()
 
     result_table.sort(key = lambda x: x[1], reverse = True)
-    
+
     if "limit" in query:
-        return result_table[:query["limit"]]
+        result_table = result_table[:query["limit"]]
     else:
-        return result_table[:10]
+        result_table = result_table[:10]
+
+    city_names = []
+    ratings = []
+    table = []
+
+    for result in result_table:
+        city_names.append(result[0])
+        ratings.append(result[1])
+        table.append(list(result))
+     
+    # Creates bar chart of normalized ratings for top cities
+    low = min(ratings) - .2
+    high = max(ratings) + .2
+    plt.ylim(low, high)
+
+    x = [i for i in range(len(city_names))]
+    plt.xlim(min(x) - .1, max(x) + .9)
+    plt.bar(x, ratings)
+    plt.xticks(x, city_names, rotation = 20)
+
+    plt.ylabel('Rating')
+    plt.title('Top Cities for ' + cuisine)
+    
+    # Saves plot to top_cities_cuisine.png
+    plt.savefig('top_cities_' + cuisine + '.png')
+    plt.close()
+
+    # Create formatted table
+#    fig, axs = plt.subplots(2,1)
+#    axs[0].axis('tight')
+#    axs[0].axis('off')
+
+#    axs[1].plot(clust_data[:,0],clust_data[:,1])
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.xaxis.set_visible(False)
+    ax.yaxis.set_visible(False)
+    colLabels=("City", "Rating", "# Restaurants")
+    the_table = ax.table(cellText=table,
+              colLabels=colLabels,
+              loc='center')
+    plt.savefig(cuisine + "_table.png")
+    plt.show()
+
+    return table
         
     
 def get_top_cuisines(query, database = "yelp_raw.db"):
@@ -92,7 +139,7 @@ def get_top_cuisines(query, database = "yelp_raw.db"):
     '''
     
     params = []
-    city = query["city"]
+    city = query["city"].lower()
     params.append(city)
 
     # If user specified price ceiling, adjusts table to return cuisines
@@ -169,13 +216,14 @@ def price_ratings(query, database = "yelp_raw.db"):
     COUNT(*) as num_restaurants 
     FROM restaurant
     WHERE city = ?
-    COLLATE nocase
+    COLLATE NOCASE
     AND reviews > 10
     GROUP BY price
     '''
     
     params = []
     city = query["city"]
+    print(city)
     params.append(city)
 
     results = c.execute(search_string, params)

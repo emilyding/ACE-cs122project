@@ -241,23 +241,11 @@ def price_ratings(query, database = "yelp_raw.db"):
     high = result_frame["Rating"].max() + .2
     plt.ylim(low, high)
 
-#    prices = []
-#    ratings = []
-#    num_restaurants = []
-#    total = 0
-#    price_keys = sorted(format_price_table.keys())
-    
-#    for price in price_keys:
-#        prices.append(price)
-#        ratings.append(format_price_table[price][0])
-#        num_restaurants.append(format_price_table[price][1])
-#        total += format_price_table[price][1]
-
     # Visualizes price to ratings graph
-    plt.xlabel('Price')
-    plt.ylabel('Avg Rating')
-    plt.title('Price to Ratings in ' + query["city"].title())
-    total = result_frame["Rating"].sum()
+    plt.xlabel("Price")
+    plt.ylabel("Avg Rating")
+    plt.title("Price to Ratings in " + query["city"].title())
+    total = result_frame["# Restaurants"].sum()
 
     max_price = length
     x_ticks = []
@@ -273,8 +261,8 @@ def price_ratings(query, database = "yelp_raw.db"):
     plt.axis([0, 5, result_frame["Rating"].min() - .1, result_frame["Rating"].max() + .1])
 
     # Saves price to ratings graph for "city" as "price_ratings_city.png"
-    plt.savefig('price_ratings_' + query["city"].replace(' ', '').lower() + '.png')
-    plt.close('all')
+    plt.savefig("price_ratings_" + query["city"].replace(' ', '').lower() + ".png")
+    plt.close("all")
 
     # Visualizes number of restaurants per price bracket as a pie graph
     colors = ['gold', 'yellowgreen', 'lightcoral', 'lightskyblue']

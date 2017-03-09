@@ -1,3 +1,17 @@
+# Distance Finder
+
+'''
+This program produces the "Starbucks Index" for a list of cities, given a csv
+containing the coordinates for each restaurant. The index reflects the median
+minimum distance necessary to travel from a random Starbucks to the nearest other 
+Starbucks. 
+
+Usage: The program can be ran by calling construct_city_index with the default 
+parameters, or others preferred by the user.
+
+Caffiene addicts can now learn where they ought to live.
+'''
+
 
 # Import necessary modules. sklearn requires installation, and installation
 # requires both numpy and scipy to be installed. To run through a Windows machine,
@@ -94,11 +108,6 @@ def convert_to_3d(coordinates):
     y = R * math.cos(math.radians(coordinates[0])) * math.sin(math.radians(coordinates[1]))
     z = R * math.sin(math.radians(coordinates[0]))
 
-    if x == "nan":
-        print("GOT TO AN ERROR")
-        print(coordinates)
-        print("GOT TO AN ERROR")
-
     return (x, y, z)
 
 def find_median_min_distance(points):
@@ -122,18 +131,17 @@ def find_median_min_distance(points):
     min_distances = []
 
     for i in range(len(points)):
+        # Checks for missing coordinates (true of 6 out 23,319 Starbucks)
         if not math.isnan(points[i][0]):
             results = tree.query([points[i]], k=2) 
             path = results[0].item(1)
             min_distances.append(path)
 
-    median_min_distance = median(min_distances)
-
-    return median_min_distance
+    return median(min_distances)
 
 
 ##### Testing Functions ######
-def go(i):
+def go_fake(i):
     '''
     Function used for testing purposes. Generates fake lat/long pairs, converts
     them to a 3D grid, then finds the median_min_distance

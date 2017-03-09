@@ -141,7 +141,7 @@ def add_csv_to_df(city_name, unique_id):
 
     # Create pandas dataframe with relevant headers
     headers = (["Unique ID", "City", "Name", "Cuisine", "Rating", "Price", "Review Count", 
-        "Neighborhood", "Address", "Zip Code", "Phone", "Latitude", "Longitude"])
+        "Neighborhood", "Address", "Zip Code", "Phone", "Longitude", "Latitude"])
     df = pd.DataFrame(restauarant_list, columns = headers)
 
     return unique_id, df

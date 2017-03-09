@@ -67,6 +67,8 @@ def get_all_starbucks(filepath = '*.csv', filename = "starbucks_locations.csv"):
     # Convert to pandas dataframe
     headers = (["City", "Latitude", "Longitude", "Review Count"])
     df = pd.DataFrame(info_list, columns = headers)
+
+    # Use "Review Count" to check for duplicates, then drop the column
     df_unique = df.drop_duplicates()
     del df_unique["Review Count"]
 
@@ -98,6 +100,8 @@ def append_location_info(city, return_dict, info_list):
         if return_dict["businesses"][i]["coordinates"]["longitude"] != "":
             info_holding.append(return_dict["businesses"][i]["coordinates"]["latitude"])
             info_holding.append(return_dict["businesses"][i]["coordinates"]["longitude"])
+
+            # Review Count is used to check for duplicates
             info_holding.append(return_dict["businesses"][i]["review_count"]) 
 
             info_list.append(info_holding)

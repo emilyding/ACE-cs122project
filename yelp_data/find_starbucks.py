@@ -42,7 +42,8 @@ def get_all_starbucks(filepath = '*.csv', filename = "starbucks_locations.csv"):
     '''
 
     # Construct a list of all cities used for the data
-    city_list = find_all_cities(filepath)
+    #city_list = find_all_cities(filepath)
+    city_list = ["topeka"]
 
     # Construct a blank list
     info_list = []
@@ -64,13 +65,15 @@ def get_all_starbucks(filepath = '*.csv', filename = "starbucks_locations.csv"):
             info_list = append_location_info(city, return_dict, info_list)
 
     # Convert to pandas dataframe
-    headers = (["City", "Latitude", "Longitude"])
+    headers = (["City", "Latitude", "Longitude", "Review Count"])
     df = pd.DataFrame(info_list, columns = headers)
+    df_unique = df.drop_duplicates()
+    del df_unique["Review Count"]
 
     # Save to csv
-    df.to_csv("starbucks_locations.csv")
+    df_unique.to_csv(filename)
 
-    return df
+    return df_unique
 
 
 def append_location_info(city, return_dict, info_list):
@@ -95,11 +98,12 @@ def append_location_info(city, return_dict, info_list):
         if return_dict["businesses"][i]["coordinates"]["longitude"] != "":
             info_holding.append(return_dict["businesses"][i]["coordinates"]["latitude"])
             info_holding.append(return_dict["businesses"][i]["coordinates"]["longitude"])
+            info_holding.append(return_dict["businesses"][i]["review_count"]) 
 
-        info_list.append(info_holding)
+            info_list.append(info_holding)
 
         # Update on progress
-        print('Finished {} Restaurant(s)'.format(len(info_list)))
+        print('Finished {} Starbucks'.format(len(info_list)))
 
     return info_list
       

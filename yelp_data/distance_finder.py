@@ -12,6 +12,15 @@ parameters, or others preferred by the user.
 Caffiene addicts can now learn where they ought to live.
 '''
 
+'''
+Note: Some Starbucks locations have identical latitude and longitude , and therefore
+have a shortest distance of 0 meters (some locations have only very slightly above 0 
+meter shortest distances). This isn't a glitch - examining the Yelp API calls reveals that
+these restaurants have distinct review counts, ratings, and phone numbers, and generally
+exist together in the same building (typically in downtown city centers). Possible duplicates
+were removed during processing in find_starbucks.py.
+'''
+
 
 # Import necessary modules. sklearn requires installation, and installation
 # requires both numpy and scipy to be installed. To run through a Windows machine,
@@ -136,6 +145,7 @@ def find_median_min_distance(points):
             results = tree.query([points[i]], k=2) 
             path = results[0].item(1)
             min_distances.append(path)
+
 
     return median(min_distances)
 

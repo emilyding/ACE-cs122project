@@ -61,11 +61,14 @@ def get_top_cities(query, database = "yelp_adjusted.db"):
     ratings = []
     table = []
 
-    for result in result_table:
-        city_names.append(result[0])
+    for index, result in enumerate(result_table):
+        result_table[index] = list(result_table)
+        city_names.append(result[0].title())
         ratings.append(result[1])
-        table.append(list(result))
-     
+        result = list(result)
+        result[0] = result[0].title()
+        table.append(result)
+
     # Creates bar chart of normalized ratings for top cities
     low = min(ratings) - .2
     high = max(ratings) + .2
@@ -77,7 +80,7 @@ def get_top_cities(query, database = "yelp_adjusted.db"):
     plt.xticks(x, city_names, rotation = 20)
 
     plt.ylabel('Rating')
-    plt.title('Top Cities for ' + cuisine)
+    plt.title('Top Cities for ' + cuisine.title())
     
     # Saves plot to top_cities_cuisine.png
     plt.savefig('top_cities_' + cuisine + '.png')
@@ -95,8 +98,8 @@ def get_top_cities(query, database = "yelp_adjusted.db"):
     ax.xaxis.set_visible(False)
     ax.yaxis.set_visible(False)
     colLabels=("City", "Rating", "# Restaurants")
-    the_table = ax.table(cellText=table,
-              colLabels=colLabels,
+    the_table = ax.table(cellText = table,
+              colLabels = colLabels,
               loc='center')
     plt.savefig(cuisine + "_table.png")
     plt.show()

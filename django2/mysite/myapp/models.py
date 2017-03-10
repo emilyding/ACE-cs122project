@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.safestring import mark_safe
 # Create your models here.
 
 class Question(models.Model):
@@ -53,10 +54,12 @@ CITY_CHOICES = (
      ('Miami', 'Miami'),
      ('Milwaukee', 'Milwaukee'),
      ('Minneapolis', 'Minneapolis'),
-     ('NashvilleNew Orleans', 'NashvilleNew Orleans'),
+     ('Nashville', 'Nashville'),
+     ('New Orleans', 'New Orleans'),
      ('New York', 'New York'),
      ('Oakland', 'Oakland'),
-     ('Oklahoma CityOmaha', 'Oklahoma CityOmaha'),
+     ('Oklahoma City', 'Oklahoma City'),
+     ('Omaha', 'Omaha'),
      ('Philadelphia', 'Philadelphia'),
      ('Phoenix', 'Phoenix'),
      ('Pittsburgh', 'Pittsburgh'),
@@ -66,7 +69,9 @@ CITY_CHOICES = (
      ('San Antonio', 'San Antonio'),
      ('San Diego', 'San Diego'),
      ('San Francisco', 'San Francisco'),
-     ('San JoseSeattleSt Louis', 'San JoseSeattleSt Louis'),
+     ('San Jose', 'San Jose'),
+     ('Seattle', 'Seattle'),
+     ('St Louis', 'St Louis'),
      ('St Paul', 'St Paul'),
      ('Tampa', 'Tampa'),
      ('Tucson', 'Tucson'),
@@ -99,8 +104,8 @@ BW_CHOICES = (
 class Comment(models.Model):
     auto_increment_id = models.AutoField(primary_key=True)
     city = models.CharField(max_length=100, choices = CITY_CHOICES, default='Chicago', verbose_name = "Please Choose a City")
-    price_limit = models.CharField(max_length=4, choices = PRICE_CHOICES, default='$$$$', verbose_name = "Limit on Price")
-    num_limit = models.CharField(max_length=10, choices = NUM_CHOICES, default='5', verbose_name = "Limit on Number of Results")
+    price_limit = models.CharField(max_length=4, choices = PRICE_CHOICES, default='$$$$', verbose_name = "Max Price")
+    num_limit = models.CharField(max_length=10, choices = NUM_CHOICES, default='5', verbose_name = "Max Number of Results")
     best_worst = models.CharField(max_length=10, choices = BW_CHOICES, default='Best', verbose_name= "Specify Best or Worst")
     def __int__(self):   # __unicode__ on Python 2
         return self.auto_increment_id

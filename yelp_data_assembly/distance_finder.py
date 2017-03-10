@@ -100,9 +100,9 @@ def convert_to_3d(coordinates):
 
     '''
 
-    # Radius of Earth (kilometers)
+    # Radius of Earth (meters)
     # Note that changing this radius changes the units of the final distance
-    R = 6371
+    R = 6371000
 
     # Convert points to 3D grid. Insight into equations provided by:
     # http://stackoverflow.com/questions/1185408/converting-from-longitude-latitude-to-cartesian-coordinates

@@ -360,5 +360,3 @@ def special_cuisine(cuisine, database = "yelp_adjusted.db"):
     mean = stat.mean(ratings_table)
 
     return sd, mean
-
-

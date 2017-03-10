@@ -24,7 +24,6 @@ urlpatterns = [
     url(r'^overview/', v.overview),
     url(r'^name/', v.name),
     url(r'^detail/',v.detail, name="detail"),
-    url(r'^chart/',v.chart, name="chart"),
     url(r'^results/',v.results, name="results"),
     url(r'^$', v.index),
 ]

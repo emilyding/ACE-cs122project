@@ -4,7 +4,8 @@ from django.http import Http404
 from django import forms 
 #
 from myapp.somebsfunctions import hash_ as h
-
+from yelp_sql import get_top_cuisines 
+ 
 def index(request):
     return render_to_response('index.html')
 
@@ -49,76 +50,27 @@ def results(request):
     num = len(Comment.objects.all())
     latest_city = get_object_or_404(Comment, pk = num )
     args = latest_city.make_dict()
-    x = h(args)
-    return render(request, 'results.html', {'output': x})
-
-
-# Create your views here.
-
-from io import StringIO
-from django.http import HttpResponse
-from django.shortcuts import render_to_response
-import pycha
-import cairo
-
-XML_PREAMBLE = '<?xml version="1.0" encoding="UTF-8"?>'
-
-def colors_chart(inline = False):
-    """
-    Generate colours chart
-
-    Set inline to True to disable the XML preamble
-    """
-    in_req = 1
-
-    svg_buffer = StringIO()
-
-    width, height = (500, 400)
-    surface = cairo.SVGSurface(svg_buffer, width, height)
-
-    dataSet = (
-     ('dataSet 1', ((0, 1), (1, 3), (2, 2.5))),
-     ('dataSet 2', ((0, 2), (1, 4), (2, 3))),
-     ('dataSet 3', ((0, 5), (1, 1), (2, 0.5))),
-    )
-
-    options = {
-        'legend': {'hide': True},
-        'background': {'color': '#f0f0f0'},
-        'colorScheme': {'name': 'fixed','args': {'colors': ['#ff0000', '#00ff00'],},
-        },
-        }
-
-    import pycha.bar
-    chart = pycha.bar.VerticalBarChart(surface, options)
-
-    #import pycha.line
-    #chart = pycha.line.LineChart(surface, options)
-    chart.addDataset(dataSet)
-    chart.render()
-
-    del chart
-    del surface
-
-    response = ''
-
-    if inline:
-        svg_buffer.seek(len(XML_PREAMBLE))
+    if args["worst"] == "Best":
+        args["worst"] = False
     else:
-        svg_buffer.seek(0)
-    return svg_buffer.read()
+        args["worst"] = True
+    if args["limit"] == "All":
+        args.pop("limit")
+    else:
+        args["limit"] = int(args["limit"])
 
-def colors_svg(request):
-    """ render a pure SVG chart """
-    response = HttpResponse(mimetype='image/svg+xml')
-    response.write(colors_chart(inline = False))
-    return response
+    top_cuisines = get_top_cuisines(args)[1]
 
-def chart(request):
-    """ render a chart into the template """
-    chart_svg = colors_chart(inline = True)
+    if len(top_cuisines) >10:
+        data_plot = top_cuisines[0:9]
+    else:
+        data_plot = top_cuisines[0:]
 
-    return render_to_response(
-        'charts.html',
-        { "chart" : chart_svg },
-        mimetype='application/xhtml+xml')
+    rows = []
+    for data in data_plot:
+        entry = (data[0], data[2])
+        rows.append(entry)
+
+    #x = h(args)
+    return render(request, 'results.html', {'output': rows})
+

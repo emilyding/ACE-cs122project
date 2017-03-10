@@ -4,7 +4,10 @@
 Takes as an input a dictionary with the name of a city, and returns interesting
 summary statistics. Note that using the adjusted database will lead to errors
 identifying universally hated/acclaimed restaurants (as ratings of 1 or 5 will
-be adjusted slightly upwards or downwards)
+be adjusted slightly upwards or downwards).
+
+If input for city is a blank dictionary '{}', results for all cities are returned
+instead.
 
 Usage: Call get_summary_info with the city of interest.
 Example Call: get_summary_info({'city': 'Los Angeles'})

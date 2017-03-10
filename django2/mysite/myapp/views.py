@@ -2,8 +2,6 @@ from django.shortcuts import render, get_object_or_404, render_to_response
 from .models import Question, Comment
 from django.http import Http404
 from django import forms 
-#
-from myapp.somebsfunctions import hash_ as h
 from yelp_sql import get_top_cuisines 
  
 def index(request):
@@ -30,6 +28,8 @@ from django.shortcuts import render, redirect
 from django import forms
 from django.utils import timezone
 from myapp.forms import MyCommentForm
+import json
+
 def name(request):
  
     if request.method == "POST":
@@ -60,17 +60,17 @@ def results(request):
         args["limit"] = int(args["limit"])
 
     top_cuisines = get_top_cuisines(args)[1]
-
-    if len(top_cuisines) >10:
-        data_plot = top_cuisines[0:9]
-    else:
-        data_plot = top_cuisines[0:]
+    
+    
+    data_plot = top_cuisines[0:5]
 
     rows = []
     for data in data_plot:
-        entry = (data[0], data[2])
+        entry = [data[0], data[2]]
         rows.append(entry)
+    
+
 
     #x = h(args)
-    return render(request, 'results.html', {'output': rows})
+    return render(request, 'charts.html', {'rows':rows, 'title': args['city']})
 

@@ -18,13 +18,7 @@ class Choice(models.Model):
     def __str__(self):
         return self.choice_text
 
-COLOR_CHOICES = (
-    ('green','GREEN'),
-    ('blue', 'BLUE'),
-    ('red','RED'),
-    ('orange','ORANGE'),
-    ('black','BLACK'),
-)
+
 
 CITY_CHOICES = (
      ('Albuquerque', 'Albuquerque'),
@@ -111,5 +105,5 @@ class Comment(models.Model):
     def __int__(self):   # __unicode__ on Python 2
         return self.auto_increment_id
     def make_dict(self):
-        args = {"city": self.city, "price_limit": self.price_limit, "num_limit": self.num_limit, "best_worst": self.best_worst}
+        args = {"city": self.city, "price": self.price_limit, "limit": self.num_limit, "worst": self.best_worst}
         return args

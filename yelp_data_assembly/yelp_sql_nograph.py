@@ -174,6 +174,60 @@ def get_top_cuisines(query, database = "yelp_raw.db"):
     return result_frame.values.tolist()
 
 
+def star_ratings(query, database = "yelp_raw.db"):
+    '''
+    Gets avg ratings for each star category for a city
+
+    Inputs:
+        - query (dict): contains desired city name
+            example query:
+            query = {"city": "chicago"}
+        - database
+
+    Output:
+        - list of lists: [rating, # restaurants, avg # reviews / restaurant]
+    '''
+
+    connection = sqlite3.connect(database)
+    c = connection.cursor()
+    
+    search_string = '''SELECT rating, COUNT(*) as num_restaurants, SUM(reviews) as num_reviews
+    FROM restaurant
+    WHERE city = ?
+    COLLATE NOCASE
+    AND reviews > 10
+    GROUP BY rating
+    '''
+    
+    params = []
+    city = query["city"]
+    params.append(city)
+
+    results = c.execute(search_string, params)
+    result_table = results.fetchall()
+
+    connection.commit()
+    c.connection.close()
+
+    # Gets average # reviews per restaurant
+    for index, result in enumerate(result_table):
+        avg_num_reviews = result[2] / result[1]
+        result_table[index] = [result[0], result[1], avg_num_reviews]
+    
+    result_frame = pd.DataFrame(result_table, 
+        columns=["Rating", "# Restaurants", "Avg Reviews Per Restaurant"])
+    result_frame = result_frame.round(2)
+    result_list = result_frame.values.tolist()
+    
+    # Undoes the side effect of calling values to list, which turns # Restaurants
+    # into floats
+    for index, result in enumerate(result_list):
+        result[1] = int(result[1])
+        result_list[index] = result
+
+    return result_list
+
+
 def price_ratings(query, database = "yelp_raw.db"):
     '''
     Gets avg ratings for each price category for a city
@@ -187,7 +241,7 @@ def price_ratings(query, database = "yelp_raw.db"):
         - database
 
     Output:
-        - list of lists: [price, avg rating, # restaurants]
+        - list of lists: [price, avg rating, # restaurants, avg # reviews / restaurant]
         - price_ratings_city.png
         - price_restaurants_city.png
     '''
@@ -196,7 +250,7 @@ def price_ratings(query, database = "yelp_raw.db"):
     c = connection.cursor()
     
     search_string = '''SELECT price, AVG(rating) as avg_rating, 
-    COUNT(*) as num_restaurants 
+    COUNT(*) as num_restaurants, SUM(reviews) as num_reviews
     FROM restaurant
     WHERE city = ?
     COLLATE NOCASE
@@ -217,15 +271,16 @@ def price_ratings(query, database = "yelp_raw.db"):
         if entry[0]:
             # Turns price from float to $
             price = math.ceil(float(entry[0])) * "$"
-            format_price_table.append([price, entry[1], entry[2]])
+            format_price_table.append([price, entry[1], entry[2], entry[3] / entry[2]])
 
     connection.commit()
     c.connection.close()
 
-    result_frame = pd.DataFrame(format_price_table, columns=["Price", "Rating", "# Restaurants"])
+    result_frame = pd.DataFrame(format_price_table, 
+        columns=["Price", "Rating", "# Restaurants", "Avg Reviews Per Restaurant"])
     result_frame = result_frame.round(2)
 
-    return format_price_table.values.tolist()
+    return format_price_table
 
 def all_cuisines(query, database = "yelp_adjusted.db"):
     '''

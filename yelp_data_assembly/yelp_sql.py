@@ -259,7 +259,7 @@ def price_ratings(query, database = "yelp_raw.db"):
     c = connection.cursor()
     
     search_string = '''SELECT price, AVG(rating) as avg_rating, 
-    COUNT(*) as num_restaurants 
+    COUNT(*) as num_restaurants
     FROM restaurant
     WHERE city = ?
     COLLATE NOCASE

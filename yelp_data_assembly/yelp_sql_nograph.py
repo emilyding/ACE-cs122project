@@ -174,7 +174,7 @@ def get_top_cuisines(query, database = "yelp_raw.db"):
     return result_frame.values.tolist()
 
 
-def star_ratings(query, database = "yelp_raw.db"):
+def star_reviews(query, database = "yelp_raw.db"):
     '''
     Gets avg ratings for each star category for a city
 
@@ -360,5 +360,3 @@ def special_cuisine(cuisine, database = "yelp_adjusted.db"):
     mean = stat.mean(ratings_table)
 
     return sd, mean
-
-

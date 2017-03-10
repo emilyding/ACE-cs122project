@@ -1,0 +1,6 @@
+Welcome to the Cuisine Aggregator!
+
+We present you a website that allows you to explore our work. The purpose of the Cuisine Aggregator is to allow you to interact with data for cuisines, in the top 50 (and more) cities in the US. Special thanks to Yelp, from which most of our data is pulled. Here is a brief rundown of what you can explore on our website:
+
+- All Cities data: get summary statistics and visualizations for data across all of the cities in our database
+- Find Top Cuisines: get summary data and visualizations on best or worst cuisines in a city, with some possible inputs you can specify.

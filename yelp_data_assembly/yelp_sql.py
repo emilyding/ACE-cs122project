@@ -292,12 +292,11 @@ def price_ratings(query, database = "yelp_raw.db"):
     # Creates bar chart of normalized ratings for top cities
     low = result_frame["Rating"].min() - .2
     high = result_frame["Rating"].max() + .2
-    plt.ylim(low, high)
 
-    # Visualizes price to ratings graph
+    # Visualizes price to ratings bar graph
     plt.xlabel("Price")
     plt.ylabel("Avg Rating")
-    plt.title("Price to Ratings in " + query["city"].title())
+    plt.title("Avg Rating by Price Bracket in " + query["city"].title())
     total = result_frame["# Restaurants"].sum()
 
     max_price = length
@@ -311,7 +310,7 @@ def price_ratings(query, database = "yelp_raw.db"):
 
     plt.xticks(x, x_ticks)
     plt.plot(x, result_frame["Rating"], 'ro')
-    plt.axis([0, 5, result_frame["Rating"].min() - .1, result_frame["Rating"].max() + .1])
+    plt.axis([0, 5, low, high])
 
     # Saves price to ratings graph for "city" as "price_ratings_city.png"
     plt.savefig("price_ratings_" + query["city"].replace(' ', '').lower() + ".png")

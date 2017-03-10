@@ -27,6 +27,8 @@ def get_top_cities(query, database = "yelp_adjusted.db"):
           [0]: city name
           [1]: average rating
           [2]: number of restaurants of that cuisine in the city
+        - bar chart cuisine_top_cities.png of top cities and ratings (normalized)
+        - table cuisine_table.png
     '''
 
     connection = sqlite3.connect(database)
@@ -60,7 +62,7 @@ def get_top_cities(query, database = "yelp_adjusted.db"):
     else:
         limit = 10
     
-    result_table = result_table[:10]
+    result_table = result_table[:limit]
 
     result_frame = pd.DataFrame(result_table, columns=["City", "Rating", "# Restaurants"])
     result_frame = result_frame.round(2)
@@ -82,12 +84,13 @@ def get_top_cities(query, database = "yelp_adjusted.db"):
     plt.ylabel('Rating')
     plt.title('Top Cities for ' + cuisine.title())
     
-    # Saves plot to top_cities_cuisine.png
-    plt.savefig('top_cities_' + cuisine + '.png')
+    # Saves plot to cuisine_top_cities_.png
+    plt.savefig(cuisine +'_top_cities_' + '.png')
     plt.close()
 
     result_frame.index = [i + 1 for i in range(length)]
 
+    # Saves table to cuisine_table.png
     fig, ax = plt.subplots(figsize=(12, 5)) # set size frame
     ax.xaxis.set_visible(False)  # hide the x axis
     ax.yaxis.set_visible(False)  # hide the y axis
@@ -406,3 +409,85 @@ def special_cuisine(cuisine, database = "yelp_adjusted.db"):
     mean = stat.mean(ratings_table)
 
     return sd, mean
+
+def common_cuisines(query, database = "yelp_adjusted.db"):
+    '''
+    Returns top cities for a cuisine, normalized by avg city ratings so that
+    reviews across cities are comparable
+
+    Required: city
+    Optional: limit of # most common cuisines returned (default 10)
+
+    Inputs:
+        - query (dict): maps city name to all available cuisines
+            example query:
+            query = {"city": "Los Angeles",
+                     "limit": 25}
+
+    Output:
+        - 
+    '''
+
+    connection = sqlite3.connect(database)
+    c = connection.cursor()
+    
+    search_string = '''SELECT cuisine, AVG(rating) as avg_rating, 
+    COUNT(*) as num_restaurants 
+    FROM restaurant
+    JOIN cuisines
+    ON restaurant.id = cuisines.id
+    WHERE city = ?
+    COLLATE NOCASE
+    GROUP BY cuisine
+    '''
+    
+    params = []
+    city = query["city"].lower()
+    params.append(city)
+
+    results = c.execute(search_string, params)
+    result_table = results.fetchall()
+
+    connection.commit()
+    c.connection.close()
+
+    result_frame = pd.DataFrame(result_table, columns=["Cuisine", "Rating", "# Restaurants"])
+    result_frame = result_frame.round(2)
+    result_frame = result_frame.set_index(["Cuisine"])
+    
+    length = len(result_frame.index)
+
+    # Visualizes price to ratings plot
+    plt.xlabel("Rating")
+    plt.ylabel("# Restaurant")
+    plt.title("Top 10 Cuisines")
+
+    plt.plot(result_frame["Rating"], result_frame["# Restaurants"], "o")
+    y_high = result_frame["# Restaurants"].max() + 10
+    x_low = result_frame["Rating"].min() - .2
+    x_high = result_frame["Rating"].max() + .2
+
+    plt.axis([x_low, x_high, 0, y_high])
+
+    # Saves price to ratings graph for "city" as "price_ratings_city.png"
+    plt.savefig("common_ratings_" + city + ".png")
+    plt.close("all")
+
+    limit = query.get("query", 10)
+    result_frame = result_frame.sort(["# Restaurants"], ascending = False)
+
+    # Saves table to cuisine_table.png
+    fig, ax = plt.subplots(figsize=(12, 5)) # set size frame
+    ax.xaxis.set_visible(False)  # hide the x axis
+    ax.yaxis.set_visible(False)  # hide the y axis
+    ax.set_frame_on(False)
+    tabla = table(ax, result_frame.head(10), loc='center', colWidths=[0.17]*len(result_frame.columns))  # where df is your data frame
+    tabla.auto_set_font_size(False) # Activate set fontsize manually
+    tabla.set_fontsize(12) # if ++fontsize is necessary ++colWidths
+    tabla.scale(1.2, 1.2) # change size table
+
+    plt.savefig(city + "_common_cuisines_table.png")
+    plt.close()
+
+    return result_frame
+  

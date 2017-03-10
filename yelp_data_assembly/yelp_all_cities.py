@@ -87,7 +87,7 @@ def cuisine_highlights(database = "yelp_adjusted.db"):
     plt.savefig("worst_cuisines.png")
     plt.close("all")
 
-    return best_list, worst_list
+    return best_list, worst_list, result_table
 
 def price_ratings(database = "yelp_raw.db"):
     '''

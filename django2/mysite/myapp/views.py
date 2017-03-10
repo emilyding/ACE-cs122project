@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, render_to_response
 from .models import Question, Comment
 from django.http import Http404
 from django import forms 
-from yelp_sql import get_top_cuisines 
+from yelp_sql_nograph import get_top_cuisines, price_ratings, star_ratings
  
 def index(request):
     return render_to_response('index.html')
@@ -58,19 +58,41 @@ def results(request):
         args.pop("limit")
     else:
         args["limit"] = int(args["limit"])
+    #compare to national average
 
-    top_cuisines = get_top_cuisines(args)[1]
-    
-    
-    data_plot = top_cuisines[0:5]
-
-    rows = []
-    for data in data_plot:
+    #top cuisine in a city
+    top_cuisines = get_top_cuisines(args)
+    data_barstop = top_cuisines[0:5]
+    barstop = []
+    for data in data_barstop:
         entry = [data[0], data[2]]
-        rows.append(entry)
-    
+        barstop.append(entry)
 
+    # price bracket
+    query = {"city": args['city']}
+    data_price = price_ratings(query)
+    pieprice = []
+    lineprice = []
+    linenumperres = []
+    for data in data_price:
+        entrypie = [data[0], data[2]]
+        entryline = [data[0], data[1]]
+        entrynumperres = [data[0], data[3]]
+        pieprice.append(entrypie)
+        lineprice.append(entryline)
+        linenumperres.append(entrynumperres)
 
+    #stars
+    data_stars = star_ratings(query)
+    piestar = []
+    linestar = []
+    for data in data_stars:
+        entrypie = [str(data[0]), data[1]]
+        entryline = [str(data[0]), data[2]]
+        piestar.append(entrypie)
+        linestar.append(entryline)
     #x = h(args)
-    return render(request, 'charts.html', {'rows':rows, 'title': args['city']})
+    return render(request, 'charts.html', {'plt1_bar':barstop, 'title': args['city'],
+        "plt2_pie":pieprice, "plt3_line":lineprice, "plt4_line":linenumperres,
+        "plt5_pie":piestar, "plt6_line":linestar})
 

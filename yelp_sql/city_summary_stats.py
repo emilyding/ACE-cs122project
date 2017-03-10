@@ -4,7 +4,10 @@
 Takes as an input a dictionary with the name of a city, and returns interesting
 summary statistics. Note that using the adjusted database will lead to errors
 identifying universally hated/acclaimed restaurants (as ratings of 1 or 5 will
-be adjusted slightly upwards or downwards)
+be adjusted slightly upwards or downwards).
+
+If input for city is a blank dictionary '{}', results for all cities are returned
+instead.
 
 Usage: Call get_summary_info with the city of interest.
 Example Call: get_summary_info({'city': 'Los Angeles'})
@@ -12,6 +15,7 @@ Example Call: get_summary_info({'city': 'Los Angeles'})
 
 import sqlite3
 import csv
+from statistics import mean
 
 # Maps cities to median min meters between starbucks
 # Dictionary readout produced by build_starbucks_dictionary.py
@@ -47,14 +51,14 @@ def build_starbucks_dictionary(filepath = 'starbucks_index.csv'):
     with open(filepath) as holding:
         reader = csv.reader(holding)
         for row in reader:
-        	# Skip headers
+            # Skip headers
             if row[2] != "Median Distance":
                 # Build dictionary, applying rounding
                 starbucks_mapper.update({row[1]: "{0:.2f}".format(float(row[2]))})
 
     return starbucks_mapper
 
-def get_summary_info(city = {'city': 'Los Angeles'}, database = "yelp_raw.db"):
+def get_summary_info(city = {}, database = "yelp_raw.db"):
     '''
     Takes in a city dictionary and database and returns summary statistics.
 
@@ -67,27 +71,37 @@ def get_summary_info(city = {'city': 'Los Angeles'}, database = "yelp_raw.db"):
     '''
 
     # Change city input to lowercase, if necessary
-    city["city"] = city["city"].lower()
+    if city != {}:
+        city["city"] = city["city"].lower()
+        starbucks_index = starbucks_mapper[city["city"]]
+    # If city s not supplied, find average distance across all keys
+    else:
+        float_distances = []
+        for distance in starbucks_mapper.values():
+            float_distances.append(float(distance))
+        starbucks_index = "{0:.2f}".format(mean(float_distances))
 
 
     # Find necessary information
     total_restaurants = find_total_restaurants(city, database)
-    starbucks_index = starbucks_mapper[city["city"]]
     most_reviewed = find_most_reviewed_restaurant(city, database)
     most_acclaimed = find_consensus_restaurant(city, database, rating = 5)
     most_hated = find_consensus_restaurant(city, database, rating = 1)
     
     # Construct Result List
     result_list = []
-    result_list.append(("Total Restaurants in City:", total_restaurants))
+    if city != {}:
+        result_list.append(("Total Restaurants in City:", total_restaurants))
+    else:
+        result_list.append(("Total Restaurants in Sample:", total_restaurants))
     result_list.append(("Starbucks Distance Index:", 
-    	"{} Meters".format(starbucks_index)))
+        "{} Meters".format(starbucks_index)))
     result_list.append(("Most Reviewed Restaurant:", 
-    	"{}, {} Reviews".format(most_reviewed[0], most_reviewed[1])))
+        "{}, {} Reviews".format(most_reviewed[0], most_reviewed[1])))
     result_list.append(("Most Reviewed 5-Star Restaurant:", 
-    	"{}, {} Reviews".format(most_acclaimed[0], most_acclaimed[1])))
+        "{}, {} Reviews".format(most_acclaimed[0], most_acclaimed[1])))
     result_list.append(("Most Reviewed 1-Star Restaurant:", 
-    	"{}, {} Reviews".format(most_hated[0], most_hated[1])))
+        "{}, {} Reviews".format(most_hated[0], most_hated[1])))
 
     return result_list
 
@@ -106,14 +120,16 @@ def find_total_restaurants(city, database):
     connection = sqlite3.connect(database)
     c = connection.cursor()
 
-    search_string = '''SELECT COUNT(*)
-    FROM restaurant
-    WHERE city = ?
-    COLLATE NOCASE
-    '''
-    params = [city["city"]]
+    search_string = '''SELECT COUNT(*) FROM restaurant '''
 
-    result = c.execute(search_string, params)
+    # If city dictionary is empty, instead return overall result
+    if city != {}:
+        search_string += '''WHERE city = ?
+            COLLATE NOCASE'''
+        params = [city["city"]]
+        result = c.execute(search_string, params)
+    else:
+         result = c.execute(search_string)
     result = result.fetchone()
 
     connection.commit()
@@ -136,14 +152,16 @@ def find_most_reviewed_restaurant(city, database):
     connection = sqlite3.connect(database)
     c = connection.cursor()
 
-    search_string = '''SELECT name, reviews 
-    FROM restaurant
-    WHERE city = ?
-    COLLATE NOCASE
-    '''
-    params = [city["city"]]
+    search_string = '''SELECT name, reviews FROM restaurant '''
+    
+    if city != {}:
+        search_string += '''WHERE city = ?
+            COLLATE NOCASE'''
+        params = [city["city"]]
+        result = c.execute(search_string, params)
+    else:
+         result = c.execute(search_string)
 
-    result = c.execute(search_string, params)
     results = result.fetchall()
 
     # Sort by review count
@@ -169,13 +187,18 @@ def find_consensus_restaurant(city, database, rating):
     connection = sqlite3.connect(database)
     c = connection.cursor()
 
+    params = [rating]
+
     search_string = '''SELECT name, reviews, rating
     FROM restaurant
-    WHERE city = ?
-    COLLATE NOCASE
-    AND rating = ?;
+    WHERE rating = ?
     '''
-    params = [city["city"], rating]
+    
+    # Skip city restriction if no city is provided
+    if city != {}:
+        search_string += '''AND city = ?
+            COLLATE NOCASE'''
+        params.append(city["city"])
 
     result = c.execute(search_string, params)
     results = result.fetchall()
@@ -187,3 +210,29 @@ def find_consensus_restaurant(city, database, rating):
     c.connection.close()
 
     return results[0]
+
+
+def summarize_all_cities(database):
+    '''
+    Collect summary table information, but for all cities
+    '''
+
+    total_restaurants = find_total_restaurants(city, database)
+    starbucks_index = starbucks_mapper[city["city"]]
+    most_reviewed = find_most_reviewed_restaurant(city, database)
+    most_acclaimed = find_consensus_restaurant(city, database, rating = 5)
+    most_hated = find_consensus_restaurant(city, database, rating = 1)
+    
+    # Construct Result List
+    result_list = []
+    result_list.append(("Total Restaurants in City:", total_restaurants))
+    result_list.append(("Starbucks Distance Index:", 
+        "{} Meters".format(starbucks_index)))
+    result_list.append(("Most Reviewed Restaurant:", 
+        "{}, {} Reviews".format(most_reviewed[0], most_reviewed[1])))
+    result_list.append(("Most Reviewed 5-Star Restaurant:", 
+        "{}, {} Reviews".format(most_acclaimed[0], most_acclaimed[1])))
+    result_list.append(("Most Reviewed 1-Star Restaurant:", 
+        "{}, {} Reviews".format(most_hated[0], most_hated[1])))
+
+    return result_list

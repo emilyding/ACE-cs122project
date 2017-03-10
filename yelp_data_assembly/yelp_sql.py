@@ -425,7 +425,9 @@ def common_cuisines(query, database = "yelp_adjusted.db"):
                      "limit": 25}
 
     Output:
-        - 
+        - pandas dataframe of sorted most common cuisines
+        - common_ratings_city.png: scatter plot of ratings to # restaurants
+        - city_common_cuisines.png: top 10 most common cuisines
     '''
 
     connection = sqlite3.connect(database)

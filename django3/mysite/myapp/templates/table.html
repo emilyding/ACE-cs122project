@@ -1,0 +1,157 @@
+<html>
+  <head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+
+      // Load the Visualization API and the corechart package.
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.load('current', {'packages':['table']});
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Fact');
+        data.addColumn('string', 'Info');
+        data.addRows({{info|safe}});
+
+        var table = new google.visualization.Table(document.getElementById('table_div'));
+
+        table.draw(data, {showRowNumber: true, width: '30%', height: '30%'});
+
+
+      // Callback that creates and populates a data table,
+      // instantiates the pie chart, passes in the data and
+      // draws it.
+        
+        // Create the data table.
+        var data0 = new google.visualization.DataTable();
+        data0.addColumn('string', 'Cuisine');
+        data0.addColumn('number', 'Rating');
+        data0.addRows({{plt1_bar|safe}});
+
+        // Set chart options
+        var options0 = {'title':'Top Cuisines by Rating',
+                       'width':600,
+                       'height':300};
+
+        // Instantiate and draw our chart, passing in some options.
+        //var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+        var chart0 = new google.visualization.BarChart(document.getElementById("chart_div0"));
+        //chart.draw(view, options);
+        chart0.draw(data0, options0);
+
+
+        // Create the data table.
+        var data1 = new google.visualization.DataTable();
+        data1.addColumn('string', 'Cuisine');
+        data1.addColumn('number', 'Rating');
+        data1.addRows({{plt2_pie|safe}});
+
+        // Set chart options
+        var options1 = {'title':'Number of Restaurants per Price Bracket',
+                       'width':600,
+                       'height':300};
+
+        // Instantiate and draw our chart, passing in some options.
+        //var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+        var chart1 = new google.visualization.PieChart(document.getElementById("chart_div1"));
+        //chart.draw(view, options);
+        chart1.draw(data1, options1);
+
+
+
+        var data2 = new google.visualization.DataTable();
+        data2.addColumn('string', 'Price');
+        data2.addColumn('number', 'Rating');
+        data2.addRows({{plt3_line|safe}});
+
+        // Set chart options
+        var options2 = {'title':'Average Rating per Price Bracket',
+                       'width':600,
+                       'height':300};
+
+        // Instantiate and draw our chart, passing in some options.
+        //var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+        var chart2 = new google.visualization.LineChart(document.getElementById("chart_div2"));
+        //chart.draw(view, options);
+        chart2.draw(data2, options2);
+
+
+        var data3 = new google.visualization.DataTable();
+        data3.addColumn('string', 'Price');
+        data3.addColumn('number', 'Number of Reviews');
+        data3.addRows({{plt4_line|safe}});
+
+        // Set chart options
+        var options3 = {'title':'Average Num of Reviews Per Restaurant per Price Bracket',
+                       'width':600,
+                       'height':300};
+
+        // Instantiate and draw our chart, passing in some options.
+        //var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+        var chart3 = new google.visualization.LineChart(document.getElementById("chart_div3"));
+        //chart.draw(view, options);
+        chart3.draw(data3, options3);
+
+        // Create the data table.
+        var data4 = new google.visualization.DataTable();
+        data4.addColumn('string', 'Stars');
+        data4.addColumn('number', 'Number of Restaurants');
+        data4.addRows({{plt5_pie|safe}});
+
+        // Set chart options
+        var options4 = {'title':'Number of Restaurants per Stars',
+                       'width':600,
+                       'height':300};
+
+        // Instantiate and draw our chart, passing in some options.
+        //var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+        var chart4 = new google.visualization.PieChart(document.getElementById("chart_div4"));
+        //chart.draw(view, options);
+        chart4.draw(data4, options4);
+
+        // Create the data table.
+        var data5 = new google.visualization.DataTable();
+        data5.addColumn('string', 'Stars');
+        data5.addColumn('number', 'Rating');
+        data5.addRows({{plt6_line|safe}});
+
+        // Set chart options
+        var options5 = {'title':'Average Number of Reviews/Restaurant per Star Rating',
+                       'width':600,
+                       'height':300};
+
+        // Instantiate and draw our chart, passing in some options.
+        //var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+        var chart5 = new google.visualization.LineChart(document.getElementById("chart_div5"));
+        //chart.draw(view, options);
+        chart5.draw(data5, options5);
+      }
+
+    </script>
+  </head>
+
+  <body>
+    <!--Div that will hold the pie chart-->
+    <div id="table_div"></div>
+    <br/>
+    <div id="chart_div0"></div>
+    <br/>
+    <div id="chart_div1"></div>
+    <br/>
+    <div id="chart_div2"></div>
+    <br/>
+    <div id="chart_div3"></div>
+    <br/>
+    <div id="chart_div4"></div>
+    <br/>
+    <div id="chart_div5"></div>
+  </body>
+</html>
+    </script>
+  </head>
+  <body>
+    <div id="table_div"></div>
+  </body>
+</html>

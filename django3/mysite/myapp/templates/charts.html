@@ -1,8 +1,30 @@
-<html>
-  <head>
-    <h1>City Snapshot: {{ title|safe }}</h1>
-    <h1></h1>
-    
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> Results </title>
+  
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{% static 'css/half-slider.css' %}" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
     <!--Load the AJAX API-->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
@@ -12,12 +34,14 @@
 
       // Set a callback to run when the Google Visualization API is loaded.
       google.charts.setOnLoadCallback(drawChart);
+      google.charts.load('current', {'packages':['table']});
+      google.charts.setOnLoadCallback(drawTable);
 
       // Callback that creates and populates a data table,
       // instantiates the pie chart, passes in the data and
       // draws it.
       function drawChart() {
-
+        
         // Create the data table.
         var data0 = new google.visualization.DataTable();
         data0.addColumn('string', 'Cuisine');
@@ -25,7 +49,7 @@
         data0.addRows({{plt1_bar|safe}});
 
         // Set chart options
-        var options0 = {'title':'Top Cuisines by Rating',
+        var options0 = {'title':'{{best_worst}} 5 Cuisines by Rating',
                        'width':600,
                        'height':300};
 
@@ -112,7 +136,7 @@
         data5.addRows({{plt6_line|safe}});
 
         // Set chart options
-        var options5 = {'title':'Average Number of Reviews/Restuarant per Star Rating',
+        var options5 = {'title':'Average Number of Reviews/Restaurant per Star Rating',
                        'width':600,
                        'height':300};
 
@@ -122,21 +146,111 @@
         //chart.draw(view, options);
         chart5.draw(data5, options5);
       }
-    </script>
-  </head>
 
-  <body>
-    <!--Div that will hold the pie chart-->
-    <div id="chart_div0"></div>
-    <br/>
-    <div id="chart_div1"></div>
-    <br/>
-    <div id="chart_div2"></div>
-    <br/>
-    <div id="chart_div3"></div>
-    <br/>
-    <div id="chart_div4"></div>
-    <br/>
-    <div id="chart_div5"></div>
-  </body>
+    </script>
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="../">Home</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="/about">About</a>
+                    </li>
+                    <li>
+                        <a href="/overview">Overview</a>
+                    </li>
+                    <li>
+                        <a href="/form">Aggregator</a>
+                    </li>
+                    <li>
+                        <a href="/topcuisines">Top Cuisines</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+        
+        
+    
+    <!-- Page Content -->
+    <div class="container">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>City Snapshot: {{ title|safe }}</h1>
+            </div>
+        </div>
+        <h3> Welcome to Your Results Page</h3>
+
+    <div><table>
+        {% for r in info %}
+          <tr><td><b>{{r.0}}</b></td><td>&emsp;{{r.1}}</td><br/></tr> 
+        {% endfor %}
+        </table></div>
+
+        <div id="chart_div0"></div>
+        <br/>
+        <div id="chart_div1"></div>
+        <br/>
+        <div id="chart_div2"></div>
+        <br/>
+        <div id="chart_div3"></div>
+        <br/>
+        <div id="chart_div4"></div>
+        <br/>
+        <div id="chart_div5"></div>
+        
+
+        
+    <!-- /.container -->
+
+    <!-- jQuery -->
+    <script src="{% static 'js/jquery.js' %}"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+    <!-- Script to Activate the Carousel -->
+    <script>
+    $('.carousel').carousel({
+        interval: 5000 //changes the speed
+    })
+    </script>
+   
+              
+        <footer>
+            <div class="row">
+                <div class="col-lg-12">
+                    <p>Copyright &copy; Your Website 2017</p>
+                </div>
+            </div>
+            <!-- /.row -->
+        </footer>
+
+    </div>
+</body>
+
 </html>
+
+
+
+

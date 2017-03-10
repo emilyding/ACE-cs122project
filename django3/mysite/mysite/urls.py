@@ -19,12 +19,11 @@ from myapp import views as v
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^citylist/', v.citylist),
     url(r'^about/', v.about),
     url(r'^overview/', v.overview),
-    url(r'^name/', v.name),
-    url(r'^detail/',v.detail, name="detail"),
-    url(r'^results/',v.results, name="results"),
+    url(r'^form/', v.form, name="City Aggregator"),
+    url(r'^results/',v.results, name="Results"),
+    url(r'^topcuisines/',v.top_cuisines, name="Top Cuisines"),
     url(r'^$', v.index),
 ]
 

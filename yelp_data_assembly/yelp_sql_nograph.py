@@ -69,7 +69,7 @@ def get_top_cities(query, database = "yelp_adjusted.db"):
     length = len(result_frame.index)
     result_frame.index = [i + 1 for i in range(length)]
 
-    return result_frame
+    return result_frame.values.tolist()
         
     
 def get_top_cuisines(query, database = "yelp_raw.db"):
@@ -171,7 +171,7 @@ def get_top_cuisines(query, database = "yelp_raw.db"):
     length = len(result_frame.index)
     result_frame.index = [i + 1 for i in range(length)]
 
-    return result_frame
+    return result_frame.values.tolist()
 
 
 def price_ratings(query, database = "yelp_raw.db"):
@@ -225,7 +225,7 @@ def price_ratings(query, database = "yelp_raw.db"):
     result_frame = pd.DataFrame(format_price_table, columns=["Price", "Rating", "# Restaurants"])
     result_frame = result_frame.round(2)
 
-    return format_price_table
+    return format_price_table.values.tolist()
 
 def all_cuisines(query, database = "yelp_adjusted.db"):
     '''
@@ -305,3 +305,5 @@ def special_cuisine(cuisine, database = "yelp_adjusted.db"):
     mean = stat.mean(ratings_table)
 
     return sd, mean
+
+

@@ -18,6 +18,7 @@ import re
 import time
 from statistics import mean
 
+
 def go(output_file = "city_ratings.csv", database1 = "yelp_raw.db", 
     database2 = "yelp_adjusted.db", source_file = "all_restaurants.csv"):
     '''
@@ -124,6 +125,45 @@ def get_city_ratings(output_file, database):
 
     return result_table
 
+
+def find_cuisines(filepath="cuisines_tags.csv"):
+    '''
+    Reads a csv copied from Yelp's category_list for v3, found here:
+    https://www.yelp.com/developers/documentation/v3/category_list
+    and converts to a usable list of string tags. Note that restaurants may
+    include cuisine tags that don't appear on this list, in the case of "hybrid"
+    restaurants (for example, several Asian restaurants are also grocery stores).
+    These tags aren't excluded.
+
+    Inputs:
+        - filepath: Filepath for the location of the csv
+
+    Returns:
+        - cuisine_tags: A list of strings
+    '''
+
+    # Open csv
+    with open(filepath, 'r') as f:
+        reader = csv.reader(f)
+        cuisine_list = list(reader)
+
+    # Translate to usable form
+    cuisine_tags = set()
+    for item in cuisine_list:
+        search = re.search(r'\((.*?)\)', item[0]).group()[1:-1]
+
+        # Creates exceptions for American (New) and American (Traditional) due
+        # to their unique formatting
+        if search == "New":
+            search = "newamerican"
+        if search == "Traditional":
+            search = 'tradamerican'
+
+        cuisine_tags.add(search)
+
+    return cuisine_tags
+
+
 def build_database(database, yelp_data):
     '''
     Given a target database name and a data source, creates a SQL database using
@@ -165,6 +205,8 @@ def build_database(database, yelp_data):
     c.execute(create_restaurant_table)
     c.execute(create_cuisine_table)
 
+    cuisine_tags = find_cuisines()
+
     # Construct strings for inserting data
     add_restaurant_data = '''INSERT INTO restaurant VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
     add_cuisine_data = '''INSERT INTO cuisines VALUES (?, ?)'''
@@ -197,7 +239,10 @@ def build_database(database, yelp_data):
 
         for cuisine_type in result:
             cuisine_type.strip(" \'")
-            cuisine_sql.append([entry[1], cuisine_type[1:-1]])
+            cuisine_type = cuisine_type[1:-1]
+            # Excludes tags that are not food tags
+            if cuisine_type.lower() in cuisine_tags:
+                cuisine_sql.append([entry[1], cuisine_type])
 
     c.executemany(add_restaurant_data, restaurant_sql)
     c.executemany(add_cuisine_data, cuisine_sql)

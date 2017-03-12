@@ -12,7 +12,7 @@
     <meta name="author" content="">
 
     <title> Overview</title>
-
+  
     <!-- Bootstrap Core CSS -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
 
@@ -31,7 +31,7 @@
 <body>
 
     <!-- Navigation -->
-    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
         <div class="container">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
@@ -41,7 +41,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Home</a>
+                <a class="navbar-brand" href="../">Home</a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -53,7 +53,10 @@
                         <a href="/overview">Overview</a>
                     </li>
                     <li>
-                        <a href="/citylist">City List</a>
+                        <a href="/form">Aggregator</a>
+                    </li>
+                    <li>
+                        <a href="/topcuisines">Top Cuisines</a>
                     </li>
                 </ul>
             </div>
@@ -62,73 +65,39 @@
         <!-- /.container -->
     </nav>
 
-    <!-- Half Page Image Background Carousel Header -->
-    <header id="myCarousel" class="carousel slide">
-        <!-- Indicators -->
-        <ol class="carousel-indicators">
-            <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-            <li data-target="#myCarousel" data-slide-to="1"></li>
-            <li data-target="#myCarousel" data-slide-to="2"></li>
-        </ol>
-
-        <!-- Wrapper for Slides -->
-        <div class="carousel-inner">
-            <div class="item active">
-                <!-- Set the first background image using inline CSS below. -->
-                <div class="fill" style="background-image:url('http://placehold.it/1900x1080&text=Slide One');"></div>
-                <div class="carousel-caption">
-                    <h2>Caption 1</h2>
-                </div>
-            </div>
-            <div class="item">
-                <!-- Set the second background image using inline CSS below. -->
-                <div class="fill" style="background-image:url('https://placeholdit.imgix.net/~text?txtsize=33&txt=350%C3%97150&w=350&h=150');"></div>
-                <div class="carousel-caption">
-                    <h2>Caption 2</h2>
-                </div>
-            </div>
-            <div class="item">
-                <!-- Set the third background image using inline CSS below. -->
-                <div class="fill" style="background-image:url('http://placehold.it/1900x1080&text=Slide Three');"></div>
-                <div class="carousel-caption">
-                    <h2>Caption 3</h2>
-                </div>
-            </div>
-        </div>
-
-        <!-- Controls -->
-        <a class="left carousel-control" href="#myCarousel" data-slide="prev">
-            <span class="icon-prev"></span>
-        </a>
-        <a class="right carousel-control" href="#myCarousel" data-slide="next">
-            <span class="icon-next"></span>
-        </a>
-
-    </header>
-
+        
+        
+    
     <!-- Page Content -->
     <div class="container">
 
         <div class="row">
             <div class="col-lg-12">
                 <h1>Overview</h1>
-                <p> Display an overview of all cities. </p>
             </div>
         </div>
+        <p> Here is an overview for all cities. </p>
+
+        
+
+        <div><table>
+        <tr><td><b>Top Rated City 1</b></td><td>&emsp;Los Angeles 3.7068</td>&emsp; &emsp;<td><b> &emsp; &emsp;Worst Rated City 1</b></td><td>&emsp;Fort Worth 3.3598</td></tr>
+
+
+        <tr><td><b>Top Rated City 2</b></td><td>&emsp;New York 3.6422</td>&emsp; &emsp;<td><b>&emsp; &emsp;Worst Rated City 2</b></td><td>&emsp;San Antonio 3.3858</td></tr>
+
+        <tr><td><b>Top Rated City 3</b></td><td>&emsp;San Dieago 3.6292</td>&emsp; &emsp;<td><b> &emsp; &emsp;Worst Rated City 3 </b></td><td>&emsp;Washington DC 3.3978</td></tr>
+        </table></div>
+
+        <div><table>
+        {% for r in facts %}
+          <tr><td><b>{{r.0}}</b></td><td>&emsp;{{r.1}}</td><br/></tr> 
+        {% endfor %}
+        </table></div>
 
         <hr>
 
-        <!-- Footer -->
-        <footer>
-            <div class="row">
-                <div class="col-lg-12">
-                    <p>Copyright &copy; Your Website 2017</p>
-                </div>
-            </div>
-            <!-- /.row -->
-        </footer>
-
-    </div>
+        
     <!-- /.container -->
 
     <!-- jQuery -->
@@ -144,6 +113,101 @@
     })
     </script>
 
+    <div class="image">
+        <img src="{% static "myapp/best_cuisines.png" %}" alt="bestcuisines" >
+    </div>
+    <div class="image">
+        <img src="{% static "myapp/worst_cuisines.png" %}" alt="worstcuisines" >
+    </div>
+    <div class="image">
+        <img src="{% static "myapp/price_ratings_all_cities.png" %}" alt="pral" >
+    </div>
+    <div class="image">
+        <img src="{% static "myapp/price_reviews_all_cities.png" %}" alt="prac" >
+    </div>
+    <div class="image">
+        <img src="{% static "myapp/star_reviews_all_cities.png" %}" alt="srac" >
+    </div>
+    <div class="image">
+        <img src="{% static "myapp/price_restaurant_all_cities.png" %}" alt="." >
+    </div>
+    <div class="image">
+        <img src="{% static "myapp/star_restaurants_all_cities.png" %}" alt="psrac" >
+
+    <p> 
+                We currently have data on the top 55 largest cities by populations. They are as follows:
+                 </p>
+                 <table>
+                <tr> Albuquerque<br/> </tr>
+                <tr> Arlington<br/></tr>
+                <tr> Atlanta<br/></tr>
+                <tr> Austin<br/></tr>
+                <tr> Baltimore<br/></tr>
+                <tr> Boston<br/></tr>
+                <tr> Buffalo<br/></tr>
+                <tr> Charlotte<br/></tr>
+                <tr> Chicago<br/></tr>
+                <tr> Cleveland<br/></tr>
+                <tr> Colorado springs<br/></tr>
+                <tr> Columbus<br/></tr>
+                <tr> Dallas<br/></tr>
+                <tr> Denver<br/></tr>
+                <tr> Detroit<br/></tr>
+                <tr> El Paso<br/></tr>
+                <tr> Fort Worth<br/></tr>
+                <tr> Fresno<br/></tr>
+                <tr> Honolulu<br/></tr>
+                <tr> Houston<br/></tr>
+                <tr> Indianapolis<br/></tr>
+                <tr> Jacksonville<br/></tr>
+                <tr> Kansas City<br/></tr>
+                <tr> Las Vegas<br/></tr>
+                <tr> Long Beach<br/></tr>
+                <tr> Los Angeles<br/></tr>
+                <tr> Louisville<br/></tr>
+                <tr> Memphis<br/></tr>
+                <tr> Mesa<br/></tr>
+                <tr> Miami<br/></tr>
+                <tr> Milwaukee<br/></tr>
+                <tr> Minneapolis<br/></tr>
+                <tr> Nashville<br/></tr>
+                <tr> New Orleans<br/></tr>
+                <tr> New York<br/></tr>
+                <tr> Oakland<br/></tr>
+                <tr> Oklahoma City<br/></tr>
+                <tr> Omaha<br/></tr>
+                <tr> Philadelphia<br/></tr>
+                <tr> Phoenix<br/></tr>
+                <tr> Pittsburgh<br/></tr>
+                <tr> Portland<br/></tr>
+                <tr> Raleigh<br/></tr>
+                <tr> Sacramento<br/></tr>
+                <tr> San Antonio<br/></tr>
+                <tr> San Diego<br/></tr>
+                <tr> San Francisco<br/></tr>
+                <tr> San Jose<br/></tr>
+                <tr> Seattle<br/></tr>
+                <tr> St. Louis<br/></tr>
+                <tr> St. Paul<br/></tr>
+                <tr> Tampa<br/></tr>
+                <tr> Tucson<br/></tr>
+                <tr> Tulsa<br/></tr>
+                <tr> Virginia Beach<br/></tr>
+                <tr> Washington DC <br/></tr>
+                 </table> 
+             </p>
+    </div>
+    <!-- Footer -->
+        <footer>
+            <div class="row">
+                <div class="col-lg-12">
+                    <p>Copyright &copy; Your Website 2017</p>
+                </div>
+            </div>
+            <!-- /.row -->
+        </footer>
+
+    </div>
 </body>
 
 </html>

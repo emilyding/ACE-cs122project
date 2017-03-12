@@ -49,9 +49,9 @@ def run_code():
         radius_deg = info[2] / 69
         
         #lat = info[0] - radius_deg # COMMENT OUT IF MID CITY
-        lat = 42.080136347826036# UNCOMMENT IF MID CITY, manually input last stopping point
+        lat = 42.090136347826036# UNCOMMENT IF MID CITY, manually input last stopping point
         #lon = info[1] - radius_deg # COMMENT OUT IF MID CITY
-        lon = -87.79487265217385# UNCOMMENT IF MID CITY, manually input last stopping point
+        lon = -87.39487265217385# UNCOMMENT IF MID CITY, manually input last stopping point
         start_lon = info[1] - radius_deg
         stop_lat = info[0] + radius_deg
         stop_lon = info[1] + radius_deg

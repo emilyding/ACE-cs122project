@@ -3,7 +3,7 @@
 '''
 This program takes a csv containing Yelp data from all restaurants in all cities,
 and constructs a SQL database storing the information. A csv file is also written
-containing average rating of restaurants in each city, so that rating information
+containing average ratings of restaurants in each city, so that rating information
 can be standardized. These standardized ratings are stored in a second SQL database.
 
 Note that the second database will result in a small number of restaurants with
@@ -192,6 +192,7 @@ def build_database(database, yelp_data):
         reviews INTEGER,
         phone VARCHAR(15),
         neighborhood VARCHAR(20),
+        address VARCHAR(40),
         lat FLOAT(25),
         lon FLOAT(25)
         );"""
@@ -208,7 +209,7 @@ def build_database(database, yelp_data):
     cuisine_tags = find_cuisines()
 
     # Construct strings for inserting data
-    add_restaurant_data = '''INSERT INTO restaurant VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
+    add_restaurant_data = '''INSERT INTO restaurant VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
     add_cuisine_data = '''INSERT INTO cuisines VALUES (?, ?)'''
 
     restaurant_sql = []
@@ -223,9 +224,10 @@ def build_database(database, yelp_data):
             restaurant_entry.append("")
         else:
             restaurant_entry.append(len(price))
-        restaurant_entry.append(entry[7]) #Review Count
+        restaurant_entry.append(entry[7]) # Review Count
         restaurant_entry.append(entry[11]) # Phone
         restaurant_entry.append(entry[8]) # Neighborhood
+        restaurant_entry.append(entry[9]) # Address
         restaurant_entry.append(entry[12]) # Latitude
         restaurant_entry.append(entry[13]) # Longitude
 

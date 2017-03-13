@@ -69,14 +69,15 @@ def get_top_cities(query, database = "yelp_adjusted.db"):
     result_frame["City"] = result_frame["City"].str.title() # Capitalize city names
     length = len(result_frame.index)
 
-    bar_frame = result_frame.head(min(limit, 10))
+    bar_frame = result_frame.head(limit)
+    # ISSUE!!!!!!!
 
     # Creates bar chart of normalized ratings for top cities
     low = bar_frame["Rating"].min() - .2
     high = bar_frame["Rating"].max() + .2
     plt.ylim(low, high)
 
-    x = [i for i in range(length)]
+    x = [i for i in range(min(limit, 10))]
     plt.xlim(min(x) - .1, max(x) + .9)
     plt.bar(x, bar_frame["Rating"])
     plt.xticks(x, bar_frame["City"], rotation = 20)
@@ -444,7 +445,7 @@ def common_cuisines(query, database = "yelp_adjusted.db"):
     '''
     
     params = []
-    city = query["city"].lower()
+    city = query["limit"].lower()
     params.append(city)
 
     results = c.execute(search_string, params)

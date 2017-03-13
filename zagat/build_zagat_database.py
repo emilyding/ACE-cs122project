@@ -171,6 +171,7 @@ def merge_data(database1 = "zagat_raw.db", database2 = "yelp_raw.db", output_dat
         reviews INTEGER,
         phone VARCHAR(15),
         neighborhood VARCHAR(20),
+        address VARCHAR(50),
         lat FLOAT(25),
         lon FLOAT(25)
         );""")
@@ -182,10 +183,12 @@ def merge_data(database1 = "zagat_raw.db", database2 = "yelp_raw.db", output_dat
     search_2 = '''SELECT name, rating
     FROM restaurant
     LIMIT 10;'''
-    search_string = '''SELECT zag_restaurant.name, zag_restaurant.rating
+    search_string = '''SELECT zag_restaurant.name, restaurant.name, zag_restaurant.rating
     FROM zag_restaurant
-    INNER JOIN restaurant
-    ON zag_restaurant.name LIKE restaurant.name;'''
+    JOIN restaurant
+    ON zag_restaurant.name = restaurant.name
+    AND zag_restaurant.address = restaurant.address
+    COLLATE NOCASE;'''
 
     #WHERE ABS(zag_restaurant.lat - restaurant.lat) < 1
     #AND ABS(zag_restaurant.lon - restaurant.lon) < 1

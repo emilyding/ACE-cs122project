@@ -1,4 +1,4 @@
-<! -- This is the template for our compare cities form page found at /compare. Code for bootstrap template is altered code taken from https://startbootstrap.com/template-overviews/modern-business/ -->
+<! -- Thsi is the template for our about page found at /about. Code for bootstrap template is altered code taken from https://startbootstrap.com/template-overviews/modern-business/ -->
 
 {% load staticfiles %}
 
@@ -13,7 +13,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title> City Aggregator</title>
+    <title> About Us</title>
   
     <!-- Bootstrap Core CSS -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
@@ -27,15 +27,15 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-    
+
 </head>
 
 <body>
 
-    <!-- Navigation. Again, taken from bootstrap template -->
+    <!-- Navigation. This snippet of code for navbar is taken and customized from bootstrap template: Modern Business.  -->
     <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
         <div class="container">
-            <!-- Brand and toggle get grouped for better mobile display (ignore) -->
+            <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                     <span class="sr-only">Toggle navigation</span>
@@ -81,26 +81,38 @@
 
         <div class="row">
             <div class="col-lg-12">
-                <h1>City Comparison Form</h1>
+                <h1>About Us</h1>
             </div>
         </div>
-        <br/>
-        <br/>
-        <p><b>Please specify the following two cities to compare:</b><br/><br/>
-        - <b>City 1:</b> select city 1 of interest from dropdown<br/>
-        - <b>City 2:</b> select city 2 of interest from dropdown<br/>
-	- <b>Cuisine: </b> you can also specify a cuisine to compare directly between two cities. Note: No graph will be presented if cuisine does not contain over 3 restaurants in each city.<br/>
-        
-        <form method="post" >
-        {% csrf_token %}
-        {{form.as_p}}
-         
-        <button type="submit" class="btn btn-default">Submit</button>
-        </form>
+        <h3> Welcome to the Cuisine Aggregator!</h3>
+
+	<p>We present you a website that allows you to explore our work. The purpose of the Cuisine Aggregator is to allow you to interact with data for cuisines, in the top 50 (and more) cities in the US. Special thanks to Yelp, from which most of our data is pulled. They were generous enough to give us access to the Yelp v3 API.<br/><br/>
+
+	 <br/> Here is a brief rundown of what you can explore on our website:<br/><br/>
+
+	- <b>Overview: </b> get summary statistics and visualizations for data across all of the cities in our database <br/>
+	<br/>
+	- <b>Find Top Cuisines: </b> get summary data and visualizations on best or worst cuisines in a city, with some possible inputs you can specify. <br/>
+	<br/>
+	- <b> City Snapshot: </b> get summary graphs and facts on the food scene in a given city with customized specifications.<br/>
+	<br/>
+	- <b>Comparing Two Cities (Upcoming):</b> select two cities and see how their cuisine data matches up through statistics and visualizations.<br/>
+	<br/>
+	- <b> Cuisine Lookup: </b> get top cities for inputed cuisine. <br/>
+	<br/>
+
+	<h4> The ACE Team </h4>
+	<b>Austin Herrick: </b> Class of 2017 
+	<br/> <b>Camille Choe:</b> Class of 2018 
+	<br/> <b>Emily Ding:</b> Class of 2018 <br/><br/>
+	 This project was compiled at the University of Chicago for CS122 Winter 2017. 
+	<br/> 
+	<br/> A special thanks to Professor Wachs, Professor Chaudhary, and the Yelp Team. <br/> </p>
+
         
 
         
-    <!-- /.container -->
+    <!-- /.container. Again, this is generated from the bootstrap moderm business theme.  -->
 
     <!-- jQuery -->
     <script src="{% static 'js/jquery.js' %}"></script>
@@ -119,7 +131,7 @@
         <footer>
             <div class="row">
                 <div class="col-lg-12">
-                    <p>Copyright &copy; Ace 2017</p>
+                    <p>Copyright &copy; ACE 2017</p>
                 </div>
             </div>
             <!-- /.row -->
@@ -129,4 +141,3 @@
 </body>
 
 </html>
-

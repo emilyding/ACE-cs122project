@@ -1,3 +1,5 @@
+<! -- This is the template for our about page found at /about. Code for bootstrap template is altered code taken from https://startbootstrap.com/template-overviews/modern-business/ -->
+
 {% load staticfiles %}
 
 <!DOCTYPE html>
@@ -30,7 +32,7 @@
 
 <body>
 
-    <!-- Navigation -->
+    <!-- Navigation. This snippet of code for navbar is taken and customized from bootstrap template: Modern Business.  -->
     <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
         <div class="container">
             <!-- Brand and toggle get grouped for better mobile display -->
@@ -53,10 +55,16 @@
                         <a href="/overview">Overview</a>
                     </li>
                     <li>
-                        <a href="/form">Aggregator</a>
+                        <a href="/topcuisines">Top Cuisines</a>
                     </li>
                     <li>
-                        <a href="/topcuisines">Top Cuisines</a>
+                        <a href="/form">City Snapshot</a>
+                    </li>
+                    <li>
+                        <a href="/compare">Compare Two Cities</a>
+                    </li>
+                    <li>
+                        <a href="/cuisine">Find Cuisine</a>
                     </li>
                 </ul>
             </div>
@@ -78,31 +86,33 @@
         </div>
         <h3> Welcome to the Cuisine Aggregator!</h3>
 
-<p>We present you a website that allows you to explore our work. The purpose of the Cuisine Aggregator is to allow you to interact with data for cuisines, in the top 50 (and more) cities in the US. Special thanks to Yelp, from which most of our data is pulled. They were generous enough to give us access to the Yelp v3 API.
+	<p>We present you a website that allows you to explore our work. The purpose of the Cuisine Aggregator is to allow you to interact with data for cuisines, in the top 50 (and more) cities in the US. Special thanks to Yelp, from which most of our data is pulled. They were generous enough to give us access to the Yelp v3 API.<br/><br/>
 
- <br/> Here is a brief rundown of what you can explore on our website:<br/>
-    <br/>
+	 <br/> Here is a brief rundown of what you can explore on our website:<br/><br/>
 
-- <b>Overview: </b> get summary statistics and visualizations for data across all of the cities in our database<br/>
-<br/>
-- <b>Find Top Cuisines: </b> get summary data and visualizations on best or worst cuisines in a city, with some possible inputs you can specify. <br/>
-<br/>
-- <b>Comparing Two Cities (Upcoming):</b> select two cities and see how their cuisine data matches up through statistics and visualizations.</p>
+	- <b>Overview: </b> get summary statistics and visualizations for data across all of the cities in our database <br/>
+	<br/>
+	- <b>Find Top Cuisines: </b> get summary data and visualizations on best or worst cuisines in a city, with some possible inputs you can specify. <br/>
+	<br/>
+	- <b> City Snapshot: </b> get summary graphs and facts on the food scene in a given city with customized specifications.<br/>
+	<br/>
+	- <b>Comparing Two Cities (Upcoming):</b> select two cities and see how their cuisine data matches up through statistics and visualizations.<br/>
+	<br/>
+	- <b> Cuisine Lookup: </b> get top cities for inputed cuisine. <br/>
+	<br/>
 
-<br/>
-<br/>
-<h4> The ACE Team </h4>
-<b>Austin Herrick: </b>Class of 2017 
-<br/> <b>Camille Choe:</b> Class of 2018 
-<br/> <b>Emily Ding:</b> Class of 2018 <br/><br/>
- This project was compiled at the University of Chicago for CS122 Winter 2017. 
-<br/>
-<br/> A special thanks to Professor Wachs, Professor Chaudhary, and the Yelp Team. <br/>
+	<h4> The ACE Team </h4>
+	<b>Austin Herrick: </b> Class of 2017 
+	<br/> <b>Camille Choe:</b> Class of 2018 
+	<br/> <b>Emily Ding:</b> Class of 2018 <br/><br/>
+	 This project was compiled at the University of Chicago for CS122 Winter 2017. 
+	<br/> 
+	<br/> A special thanks to Professor Wachs, Professor Chaudhary, and the Yelp Team. <br/> </p>
 
         
 
         
-    <!-- /.container -->
+    <!-- /.container. Again, this is generated from the bootstrap moderm business theme.  -->
 
     <!-- jQuery -->
     <script src="{% static 'js/jquery.js' %}"></script>
@@ -121,7 +131,7 @@
         <footer>
             <div class="row">
                 <div class="col-lg-12">
-                    <p>Copyright &copy; Your Website 2017</p>
+                    <p>Copyright &copy; ACE 2017</p>
                 </div>
             </div>
             <!-- /.row -->

@@ -1,4 +1,4 @@
-# This file allows functionality from google charts and writes stepchart class. Code was taken from https://www.pydanny.com/core-concepts-django-modelforms.html and is not original and has not been altered.
+# This file allows functionality from google charts and writes stepchart class. Code was taken from https://www.pydanny.com/core-concepts-django-modelforms.html and is not original. 
 
 from django_google_charts import charts
 from .models import StepCount

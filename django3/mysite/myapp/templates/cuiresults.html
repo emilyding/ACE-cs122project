@@ -1,4 +1,5 @@
-<! -- This is the template for our compare cities form page found at /compare. Code for bootstrap template is altered code taken from https://startbootstrap.com/template-overviews/modern-business/ -->
+<! -- This is the template for the cuiresults page after submiting the cuisine lookup form. This is at /cuiresults. Code for bootstrap template is altered code taken from https://startbootstrap.com/template-overviews/modern-business/. Google charts taken from google charts documentation. -->
+
 
 {% load staticfiles %}
 
@@ -13,9 +14,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title> City Aggregator</title>
+    <title> Cuisine Lookup Results </title>
   
-    <!-- Bootstrap Core CSS -->
+    <!-- Bootstrap Core CSS. Again, this is snipped code from bootstrap template -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
 
     <!-- Custom CSS -->
@@ -27,12 +28,63 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-    
+
+
+    <!--Load the AJAX API. Code references google charts API documentation-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+
+      // Load the Visualization API and the corechart package.
+    google.charts.load('current', {'packages':['corechart']});
+
+      // Set a callback to run when the Google Visualization API is loaded.
+    google.charts.setOnLoadCallback(drawChart);
+
+      // Callback that creates and populates a data table, creates a chart, and draws it.
+
+    function drawChart() {
+        
+        // Create the data table. This is graph one and displays rating of cuisines in top cities in a bar graph.
+        var data0 = new google.visualization.DataTable();
+        data0.addColumn('string', 'Cuisine');
+        data0.addColumn('number', 'Rating');
+        data0.addRows({{bar1|safe}});
+
+        // Set chart options
+        var options0 = {'title':'Cities with Best {{cuisine}} by Rating ',
+                       'width':600,
+                       'height':300};
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart0 = new google.visualization.BarChart(document.getElementById("chart_div0"));
+        chart0.draw(data0, options0);
+
+
+        // Create the data table. This is graph one and displays number of restaurants in each of the top cities for given cuisine in a bar graph.
+        var data0 = new google.visualization.DataTable();
+        var data1 = new google.visualization.DataTable();
+        data1.addColumn('string', 'Cuisine');
+        data1.addColumn('number', 'Number of Restaurants');
+        data1.addRows({{bar2|safe}});
+
+        // Set chart options
+        var options1 = {'title':'Number of Restaurants for Top Cities with {{cuisine}} ',
+                       'width':600,
+                       'height':300};
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart1 = new google.visualization.BarChart(document.getElementById("chart_div1"));
+        chart1.draw(data1, options1);
+    }
+
+       
+    </script>
+
 </head>
 
 <body>
 
-    <!-- Navigation. Again, taken from bootstrap template -->
+    <!-- Navigation. Again, code is snipped from bootstrap template. -->
     <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
         <div class="container">
             <!-- Brand and toggle get grouped for better mobile display (ignore) -->
@@ -81,25 +133,12 @@
 
         <div class="row">
             <div class="col-lg-12">
-                <h1>City Comparison Form</h1>
+                <h1>Cuisine Lookup: {{cuisine}}</h1>
             </div>
         </div>
-        <br/>
-        <br/>
-        <p><b>Please specify the following two cities to compare:</b><br/><br/>
-        - <b>City 1:</b> select city 1 of interest from dropdown<br/>
-        - <b>City 2:</b> select city 2 of interest from dropdown<br/>
-	- <b>Cuisine: </b> you can also specify a cuisine to compare directly between two cities. Note: No graph will be presented if cuisine does not contain over 3 restaurants in each city.<br/>
-        
-        <form method="post" >
-        {% csrf_token %}
-        {{form.as_p}}
-         
-        <button type="submit" class="btn btn-default">Submit</button>
-        </form>
-        
-
-        
+    
+    <div id="chart_div0"> </div>
+    <div id="chart_div1"> </div>
     <!-- /.container -->
 
     <!-- jQuery -->
@@ -119,7 +158,7 @@
         <footer>
             <div class="row">
                 <div class="col-lg-12">
-                    <p>Copyright &copy; Ace 2017</p>
+                    <p>Copyright &copy; ACE 2017</p>
                 </div>
             </div>
             <!-- /.row -->
@@ -129,4 +168,7 @@
 </body>
 
 </html>
+
+
+
 

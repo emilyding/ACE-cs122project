@@ -1,5 +1,3 @@
-<! -- Thsi is the template for the /results page found found after submitting the form for City Snapshot. Code for bootstrap template is altered code taken from https://startbootstrap.com/template-overviews/modern-business/ Google charts is based off of sample code found in the documentation.-->
-
 {% load staticfiles %}
 
 <!DOCTYPE html>
@@ -13,9 +11,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title> City Snapshot Results </title>
+    <title> Results </title>
   
-    <!-- Bootstrap Core CSS. This is not original code bus is altered to use theme and navebar. -->
+    <!-- Bootstrap Core CSS -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
 
     <!-- Custom CSS -->
@@ -27,9 +25,7 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-
-
-    <!--Load the AJAX API. Again, this is code taken from google charts API documentation.-->
+    <!--Load the AJAX API-->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
 
@@ -41,47 +37,51 @@
       google.charts.load('current', {'packages':['table']});
       google.charts.setOnLoadCallback(drawTable);
 
-      // Callback that creates and populates a data table, creates chart, and draws it.
+      // Callback that creates and populates a data table,
+      // instantiates the pie chart, passes in the data and
+      // draws it.
       function drawChart() {
         
-
-        // Create data table. This is the first graph that gives a bar graph of top best/worst cuisine by rating.
+        // Create the data table.
         var data0 = new google.visualization.DataTable();
         data0.addColumn('string', 'Cuisine');
         data0.addColumn('number', 'Rating');
         data0.addRows({{plt1_bar|safe}});
 
-        // Set options
+        // Set chart options
         var options0 = {'title':'{{best_worst}} 5 Cuisines by Rating',
                        'width':600,
                        'height':600};
 
-        // Draw a bar chart with given ID
-
+        // Instantiate and draw our chart, passing in some options.
+        //var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
         var chart0 = new google.visualization.BarChart(document.getElementById("chart_div0"));
         //chart.draw(view, options);
         chart0.draw(data0, options0);
 
 
-        // Create the data table. This is graph two. Draws a pie graph comparing # of restaurant to price bracket
+        // Create the data table.
         var data1 = new google.visualization.DataTable();
-        data1.addColumn('string', 'Price');
-        data1.addColumn('number', '# of Restaurants');
+        data1.addColumn('string', 'Cuisine');
+        data1.addColumn('number', 'Rating');
         data1.addRows({{plt2_pie|safe}});
+
         // Set chart options
         var options1 = {'title':'Number of Restaurants per Price Bracket',
                        'width':600,
                        'height':300};
-        // Draw our chart, with some options.
+
+        // Instantiate and draw our chart, passing in some options.
+        //var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
         var chart1 = new google.visualization.PieChart(document.getElementById("chart_div1"));
         //chart.draw(view, options);
         chart1.draw(data1, options1);
 
 
-	// Create the data table. This is graph three. Draws a line graph comparing average rating to price.
+
         var data2 = new google.visualization.DataTable();
         data2.addColumn('string', 'Price');
-        data2.addColumn('number', 'Average Rating');
+        data2.addColumn('number', 'Rating');
         data2.addRows({{plt3_line|safe}});
 
         // Set chart options
@@ -90,11 +90,12 @@
                        'height':300};
 
         // Instantiate and draw our chart, passing in some options.
+        //var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
         var chart2 = new google.visualization.LineChart(document.getElementById("chart_div2"));
         //chart.draw(view, options);
         chart2.draw(data2, options2);
 
-	// Create the data table. This is graph four. Draws a line graph compared # of reviews/restaurant to price bracket
+
         var data3 = new google.visualization.DataTable();
         data3.addColumn('string', 'Price');
         data3.addColumn('number', 'Number of Reviews');
@@ -106,13 +107,12 @@
                        'height':300};
 
         // Instantiate and draw our chart, passing in some options.
+        //var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
         var chart3 = new google.visualization.LineChart(document.getElementById("chart_div3"));
         //chart.draw(view, options);
         chart3.draw(data3, options3);
 
-
-
-        // Create the data table. This is graph five. Draws a pie graph compared # of restaurant to stars
+        // Create the data table.
         var data4 = new google.visualization.DataTable();
         data4.addColumn('string', 'Stars');
         data4.addColumn('number', 'Number of Restaurants');
@@ -124,13 +124,15 @@
                        'height':300};
 
         // Instantiate and draw our chart, passing in some options.
+        //var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
         var chart4 = new google.visualization.PieChart(document.getElementById("chart_div4"));
+        //chart.draw(view, options);
         chart4.draw(data4, options4);
 
-        // Create the data table. This is graph six. Draws a line graph compared Average # of Reviews/restaurant to stars
+        // Create the data table.
         var data5 = new google.visualization.DataTable();
         data5.addColumn('string', 'Stars');
-        data5.addColumn('number', 'Average Number of Reviews/Restaurant');
+        data5.addColumn('number', 'Rating');
         data5.addRows({{plt6_line|safe}});
 
         // Set chart options
@@ -139,11 +141,12 @@
                        'height':300};
 
         // Instantiate and draw our chart, passing in some options.
+        //var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
         var chart5 = new google.visualization.LineChart(document.getElementById("chart_div5"));
+        //chart.draw(view, options);
         chart5.draw(data5, options5);
 
-
-        // Create the data table. This is graph seven. Draws a pie graph comparing Number of Restaurant to Cuisine
+        // Create the data table.
         var data6 = new google.visualization.DataTable();
         data6.addColumn('string', 'Cuisine');
         data6.addColumn('number', 'Number of Restaurants');
@@ -154,13 +157,13 @@
                        'width':600,
                        'height':300};
 
-        // Instantiate and draw our chart, passing in some options.;
+        // Instantiate and draw our chart, passing in some options.
+        //var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
         var chart6 = new google.visualization.BarChart(document.getElementById("chart_div6"));
+        //chart.draw(view, options);
         chart6.draw(data6, options6);
 
-
-
-        // Create the data table. This is graph eight. Draws a scatter graph compared # of restaurant to rating for each cuisine.
+        // Create the data table.
         var data7 = new google.visualization.DataTable();
         data7.addColumn('number', 'Rating');
         data7.addColumn('number', 'Number of Restaurants');
@@ -172,7 +175,9 @@
                        'height':300};
 
         // Instantiate and draw our chart, passing in some options.
+        //var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
         var chart7 = new google.visualization.ScatterChart(document.getElementById("chart_div7"));
+        //chart.draw(view, options);
         chart7.draw(data7, options7);
       }
 
@@ -182,10 +187,10 @@
 
 <body>
 
-    <!-- Navigation. Altered code taken from bootstrap template. -->
+    <!-- Navigation -->
     <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
         <div class="container">
-            <!-- Brand and toggle get grouped for better mobile display (ignore) -->
+            <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                     <span class="sr-only">Toggle navigation</span>
@@ -226,7 +231,7 @@
         
         
     
-    <!-- Page Content. Displays table of fun facts and charts. -->
+    <!-- Page Content -->
     <div class="container">
 
         <div class="row">
@@ -236,7 +241,7 @@
         </div>
         <h3> Welcome to Your Results Page</h3>
 
-    	<div><table>
+    <div><table>
         {% for r in info %}
           <tr><td><b>{{r.0}}</b></td><td>&emsp;{{r.1}}</td><br/></tr> 
         {% endfor %}

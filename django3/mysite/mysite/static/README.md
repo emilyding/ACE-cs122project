@@ -1,3 +1,5 @@
+This README was created by the bootstrap template and included in here. The only customized content in this folder are the images in myapp directory. These are static images refered to from our website.
+
 # unaltered : file created by bootstrap template from https://startbootstrap.com/template-overviews/modern-business/
 
 # [Start Bootstrap](http://startbootstrap.com/) - [Half Slider](http://startbootstrap.com/template-overviews/half-slider/)

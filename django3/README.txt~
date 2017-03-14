@@ -1,0 +1,3 @@
+The Mysite directory contains all files necessary for the website. To run website, navigate into mysite and type "python manage.py runserver" into linux comand line. 
+
+

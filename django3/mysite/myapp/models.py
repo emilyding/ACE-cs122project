@@ -274,3 +274,11 @@ class Compare(models.Model):
     def make_dict(self):
         args = ({'city': self.city1}, {'city': self.city2}, self.cuisine)
         return args
+
+class Cuisine(models.Model):
+    idd = models.AutoField(primary_key= True)
+    cuisine = models.CharField(max_length = 100, choices = CUISINE_CHOICES, default = 'Waffle', verbose_name = "To find top city for a cuisine, choose cuisine here:")
+    def __int__(self):
+        return self.idd
+    def make_dict(self):
+        return self.cuisine

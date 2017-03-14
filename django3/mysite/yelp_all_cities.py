@@ -1,3 +1,6 @@
+'''
+This files is not refered to in website but is included because it generates graphs used for /overview. These grahs give information on aggregation over all cities.
+'''
 import sqlite3
 import csv
 import string

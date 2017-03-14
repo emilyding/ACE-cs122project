@@ -1,4 +1,4 @@
-<! -- This is the template for the home page. Code for bootstrap template is altered code taken from https://startbootstrap.com/template-overviews/modern-business/. -->
+<! -- This is the template for the home page. Code for bootstrap template is altered code taken from https://startbootstrap.com/template-overviews/modern-business/. Google charts taken from google charts documentation. -->
 
 {% load staticfiles %}
 

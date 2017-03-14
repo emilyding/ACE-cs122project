@@ -174,9 +174,9 @@ def get_top_cuisines(query, database = "yelp_raw.db"):
     return result_frame.values.tolist()
 
 
-def star_ratings(query, database = "yelp_raw.db"):
+def star_reviews(query, database = "yelp_raw.db"):
     '''
-    Gets avg ratings for each star category for a city
+    Gets # of restaurants and avg reviews / restaurant for each star category for a city
 
     Inputs:
         - query (dict): contains desired city name
@@ -361,4 +361,43 @@ def special_cuisine(cuisine, database = "yelp_adjusted.db"):
 
     return sd, mean
 
+def common_cuisines(query, database = "yelp_adjusted.db"):
+    '''
+    Returns most common cuisines with ratings
 
+    Inputs:
+        - query (dict): maps city name to all available cuisines
+            example query:
+            query = {"city": "Los Angeles"}
+
+    Output:
+        - pandas dataframe of sorted most common cuisines
+    '''
+
+    connection = sqlite3.connect(database)
+    c = connection.cursor()
+    
+    search_string = '''SELECT cuisine, AVG(rating) as avg_rating, 
+    COUNT(*) as num_restaurants 
+    FROM restaurant
+    JOIN cuisines
+    ON restaurant.id = cuisines.id
+    WHERE city = ?
+    COLLATE NOCASE
+    GROUP BY cuisine
+    '''
+    
+    params = []
+    city = query["city"].lower()
+    params.append(city)
+
+    results = c.execute(search_string, params)
+    result_table = results.fetchall()
+
+    connection.commit()
+    c.connection.close()
+
+    result_frame = pd.DataFrame(result_table, columns=["Cuisine", "Rating", "# Restaurants"])
+    result_frame = result_frame.round(2) # Rounds values
+    
+    return result_frame.values.tolist()

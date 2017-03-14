@@ -1,0 +1,44 @@
+<h1>Get Top Cuisines</h1>
+<h3>Please Specify:</h3>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<h5>{{ city.question_text }}</h5>
+<form method="post">
+<select name="Cities">
+    {% for choice in city.choice_set.all %}
+        <option name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}"</option>
+        <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br /></option>
+    {% endfor %}
+        </select>
+
+
+
+<h5>{{ price_limit.question_text }}</h5>
+<form method="post">
+<select name="Price Limit">
+    {% for choice in price_limit.choice_set.all %}
+        <option name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}"</option>
+        <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br /></option>
+    {% endfor %}
+        </select>
+
+<h5>{{ num_results.question_text }}</h5>
+<form method="post">
+<select name="Number of Results">
+    {% for choice in num_results.choice_set.all %}
+        <option name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}"</option>
+        <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br /></option>
+    {% endfor %}
+        </select>
+
+<h5>{{ best_worst.question_text }}</h5>
+<form method="post">
+<select name="Best or Worst">
+    {% for choice in best_worst.choice_set.all %}
+        <option name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}"</option>
+        <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br /></option>
+    {% endfor %}
+        </select>
+<input type="submit" value="Vote" />
+

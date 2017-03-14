@@ -1,24 +1,51 @@
+'''
+This file writes models using django capacity. 
+The file contains Question and Choice which are used for learning and testing and is not used for the website. It also contains Compare, Cuisine, and Comment.
+'''
+
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
+#just in case, to pass data to rendering
 from django.utils.safestring import mark_safe
-# Create your models here.
+
+#these two classes are from the Django Tutorial. They are included for
+#testing purposes and are never displayed in the website.
+
 
 class Question(models.Model):
+    '''
+    The Question model contains three fields:
+        question_text: to input text for question_text
+        pub_date: uses date time to designate data/time. IF USED, PLEASE IMPORT timezone
+    '''
     question_text = models.CharField(max_length=200)
     pub_date = models.DateTimeField('date published')
-    selection = ""
+
     def __str__(self):
+        #self is named with a string (the question text)
         return self.question_text
     def was_published_recently(self):
+        # a function to determine if question was published recently.
         return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
 
+
 class Choice(models.Model):
+    '''
+    The Choice model contains answer choices. It is linked to Questions.
+
+    Fields contained:
+        question: the question it is linked to
+        choice_text: a string input for choice text
+        votes: how many votes there has been. 
+    '''
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice_text = models.CharField(max_length=200)
     votes = models.IntegerField(default=0)
     def __str__(self):
+        #choices are named with a string after choice_text
         return self.choice_text
 
+#all the choice options for cities in our data. Referenced in dropdowns.
 CITY_CHOICES = (
      ('Albuquerque', 'Albuquerque'),
      ('Arlington', 'Arlington'),
@@ -78,6 +105,7 @@ CITY_CHOICES = (
      ('Washington DC', 'Washington DC')
 )
 
+#All Price Choices that is inclued in data. Referenced in dropdown.
 PRICE_CHOICES = (
     ('$','$'),
     ('$$', '$$'),
@@ -85,6 +113,7 @@ PRICE_CHOICES = (
     ('$$$$','$$$$')
 )
 
+# Choices for upper limit. Taken out as a feature.
 
 NUM_CHOICES = (
     ('5','5'),
@@ -94,11 +123,13 @@ NUM_CHOICES = (
     ('All','All')
 )
 
+#Choices for best/worst dropdown.
 BW_CHOICES = (
     ('Best','Best'),
     ('Worst', 'Worst')
 )
 
+#All cuisine tags in our data. Referenced in dropdown.
 CUISINE_CHOICES = (
      ('None', "--"),
      ('Afghan', 'Afghan'),
@@ -253,29 +284,59 @@ CUISINE_CHOICES = (
 )
 
 class Comment(models.Model):
+    '''
+    The Comment model allows user to input when generating a city snapshot
+    Contains the following fields:
+        auto_increment_id: primary key id for each input
+        city: designated city for snapshot lookup
+        price_limit: upper limit on prices of restaurants that is searched and aggregated
+            for top cuisines.
+        num_limit: (discontinued feature because makes website slow) 
+            allows user to input upper limit on number of restaruants returned for "top cuisines"
+        best_worst: a field to designate whether user is interested in best or worst cuisine
+    '''
     auto_increment_id = models.AutoField(primary_key=True)
     city = models.CharField(max_length=100, choices = CITY_CHOICES, default='Chicago', verbose_name = "Please Choose a City")
     price_limit = models.CharField(max_length=4, choices = PRICE_CHOICES, default='$$$$', verbose_name = "Max Price")
+    # Note: field num_limit is included for grading but is not used in site.
     num_limit = models.CharField(max_length=10, choices = NUM_CHOICES, default='5', verbose_name = "Max Number of Results")
     best_worst = models.CharField(max_length=10, choices = BW_CHOICES, default='Best', verbose_name= "Specify Best or Worst")
-    def __int__(self):   # __unicode__ on Python 2
+    def __int__(self):   
+        #class is named and refered to by id
         return self.auto_increment_id
     def make_dict(self):
+        #a function to format input to use in views. makes a dictionary.
         args = {"city": self.city, "price": self.price_limit, "limit": self.num_limit, "worst": self.best_worst}
         return args
 
 class Compare(models.Model):
+    '''
+    The Compare model allows user to input two cities and a cuisine when comparing two cities.
+    Contains the following dropdown fields:
+        idd: primary key id for each input
+        city1: city 1 to compare
+        city2: city 2 to compare
+        cuisine: if user is interested in cuisine, can designate and compare across two cities.
+    '''
     idd = models.AutoField(primary_key= True)
     city1 = models.CharField(max_length=100, choices= CITY_CHOICES, default = 'Chicago', verbose_name = "Choose City 1")
     city2 = models.CharField(max_length = 100, choices = CITY_CHOICES, default= 'New York', verbose_name = "Choose City 2")
     cuisine = models.CharField(max_length = 100, choices = CUISINE_CHOICES, default = 'Waffle', verbose_name = "If you would like to specify a cuisine for comparison, choose here:")
     def __int__(self):
+        #Compare class is identified and named as an integer 
         return self.idd
     def make_dict(self):
+        #a function to format input to use in views. makes a dictionary.
         args = ({'city': self.city1}, {'city': self.city2}, self.cuisine)
         return args
 
 class Cuisine(models.Model):
+    '''
+    The Compare model allows user to input cuisine to find top cities.
+    Contains the following (dropdown) fields:
+        idd: primary key id for each input (not dropdown)
+        cuisine: if user is interested in cuisine, can designate and lookup best cities (dropdown)
+    '''
     idd = models.AutoField(primary_key= True)
     cuisine = models.CharField(max_length = 100, choices = CUISINE_CHOICES, default = 'Waffle', verbose_name = "To find top city for a cuisine, choose cuisine here:")
     def __int__(self):

@@ -1,16 +1,23 @@
-from django.shortcuts import render, get_object_or_404, render_to_response
-from .models import Comment, Compare, Cuisine
+'''
+This file writes views. Forms use django's ModelForm capacity. This is original code; however, credit must be attributed to the following sites which were used as resources:
+	-http://www.effectivedjango.com/tutorial/forms.html
+	-http://blog.appliedinformaticsinc.com/using-django-modelform-a-quick-guide/
+	-https://www.pydanny.com/core-concepts-django-modelforms.html
+'''
+
+from django.shortcuts import render, get_object_or_404, render_to_response, redirect
 from django.http import Http404
-from django import forms 
+
+from django import forms
+from .models import Comment, Compare, Cuisine
+from myapp.forms import MyCommentForm, MyCompareForm, MyCuisineForm
+from django.utils import timezone 
+
 from yelp_sql_nograph import get_top_cuisines, price_ratings, star_reviews, common_cuisines, get_top_cities
 from city_summary_stats import get_summary_info
-from django.shortcuts import render, redirect
-from django import forms
-from django.utils import timezone
-from myapp.forms import MyCommentForm, MyCompareForm, MyCuisineForm
 from yelp_all_cities import cuisine_highlights
 from compare_cities import compare_cuisines
-import json
+
 
 def index(request):
     return render_to_response('index.html')

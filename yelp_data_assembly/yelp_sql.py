@@ -412,17 +412,12 @@ def special_cuisine(cuisine, database = "yelp_adjusted.db"):
 
 def common_cuisines(query, database = "yelp_adjusted.db"):
     '''
-    Returns top cities for a cuisine, normalized by avg city ratings so that
-    reviews across cities are comparable
-
-    Required: city
-    Optional: limit of # most common cuisines returned (default 10)
+    Returns most common cuisines with ratings
 
     Inputs:
         - query (dict): maps city name to all available cuisines
             example query:
-            query = {"city": "Los Angeles",
-                     "limit": 25}
+            query = {"city": "Los Angeles"}
 
     Output:
         - pandas dataframe of sorted most common cuisines
@@ -444,7 +439,7 @@ def common_cuisines(query, database = "yelp_adjusted.db"):
     '''
     
     params = []
-    city = query["limit"].lower()
+    city = query["city"].lower()
     params.append(city)
 
     results = c.execute(search_string, params)

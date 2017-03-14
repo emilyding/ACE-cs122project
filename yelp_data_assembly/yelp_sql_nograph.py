@@ -176,7 +176,7 @@ def get_top_cuisines(query, database = "yelp_raw.db"):
 
 def star_reviews(query, database = "yelp_raw.db"):
     '''
-    Gets avg ratings for each star category for a city
+    Gets avg reviews per restaurant for each star category for a city
 
     Inputs:
         - query (dict): contains desired city name
@@ -398,7 +398,9 @@ def common_cuisines(query, database = "yelp_adjusted.db"):
     c.connection.close()
 
     result_frame = pd.DataFrame(result_table, columns=["Cuisine", "Rating", "# Restaurants"])
-    result_frame = result_frame.round(2) # Rounds values
+    result_frame = result_frame.round(2) # Rounds values    
+    result_frame = result_frame.sort_values("# Restaurants", ascending = False)
+    top5 = result_frame.iloc[:5]
     result_frame = result_frame.set_index(["Cuisine"]) # Changes index to Cuisine
-    
-    return result_frame.values.tolist()
+
+    return top5, result_frame.values.tolist()

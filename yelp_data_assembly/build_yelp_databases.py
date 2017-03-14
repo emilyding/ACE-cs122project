@@ -193,6 +193,7 @@ def build_database(database, yelp_data):
         phone VARCHAR(15),
         neighborhood VARCHAR(20),
         address VARCHAR(40),
+        zipcode INTEGER,
         lat FLOAT(25),
         lon FLOAT(25)
         );"""
@@ -210,7 +211,7 @@ def build_database(database, yelp_data):
     cuisine_tags = find_cuisines()
 
     # Construct strings for inserting data
-    add_restaurant_data = '''INSERT INTO restaurant VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
+    add_restaurant_data = '''INSERT INTO restaurant VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
     add_cuisine_data = '''INSERT INTO cuisines VALUES (?, ?)'''
 
     restaurant_sql = []
@@ -229,6 +230,7 @@ def build_database(database, yelp_data):
         restaurant_entry.append(entry[11]) # Phone
         restaurant_entry.append(entry[8]) # Neighborhood
         restaurant_entry.append(entry[9]) # Address
+        restaurant_entry.append(entry[10]) # Zipcode
         restaurant_entry.append(entry[13]) # Latitude
         restaurant_entry.append(entry[12]) # Longitude
 

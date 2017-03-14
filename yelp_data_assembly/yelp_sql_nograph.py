@@ -56,14 +56,13 @@ def get_top_cities(query, database = "yelp_adjusted.db"):
 
     if "limit" in query:
         limit = query["limit"]
-
     else:
         limit = 10
     
-    result_table = result_table[:10]
+    result_table = result_table[:limit]
 
     result_frame = pd.DataFrame(result_table, columns=["City", "Rating", "# Restaurants"])
-    result_frame = result_frame.round(2)
+    result_frame = result_frame.round(2) # Rounds values to second decimal place
     result_frame["City"] = result_frame["City"].str.title() # Capitalize city names
 
     length = len(result_frame.index)
@@ -131,13 +130,29 @@ def get_top_cuisines(query, database = "yelp_raw.db"):
     else:
         result_table.sort(key = lambda x: x[2], reverse = True)
 
-    # Formats prices and ensures cuisines have > 10 restaurants
-    format_price_table = []
-    
     if "limit" in query:
         limit = query["limit"]
     else:
         limit = 10
+
+    format_price_table = format_cuisine_table(limit, result_table)
+    result_frame = pd.DataFrame(format_price_table, 
+        columns=["Cuisine", "Price", "Rating", "# Restaurants", "Total Reviews", "All Cities Comparison"])
+    result_frame = result_frame.round(2)
+    result_frame["Cuisine"] = result_frame["Cuisine"].str.title() # Capitalize city names
+
+    length = len(result_frame.index)
+    result_frame.index = [i + 1 for i in range(length)]
+
+    return result_frame.values.tolist()
+
+
+def format_cuisine_table(limit, result_table):
+    '''
+    Formats prices and ensures cuisines have > 10 restaurants
+    '''
+
+    format_price_table = []
     count = 0
     
     for entry in result_table:
@@ -150,7 +165,7 @@ def get_top_cuisines(query, database = "yelp_raw.db"):
             # Restricts to cuisines with > 10 restaurants
             if entry[3] > 10:
                 # Get relative rating compared to other cities
-                sd, mean = special_cuisine(entry[0])
+                sd, mean = cuisine_stats(entry[0])
                 if math.fabs(entry[2] - mean) <= sd:
                     special = "average"
                 elif entry[2] - mean > 0:
@@ -163,15 +178,7 @@ def get_top_cuisines(query, database = "yelp_raw.db"):
         else:
             break
 
-    result_frame = pd.DataFrame(format_price_table, 
-        columns=["Cuisine", "Price", "Rating", "# Restaurants", "Total Reviews", "All Cities Comparison"])
-    result_frame = result_frame.round(2)
-    result_frame["Cuisine"] = result_frame["Cuisine"].str.title() # Capitalize city names
-
-    length = len(result_frame.index)
-    result_frame.index = [i + 1 for i in range(length)]
-
-    return result_frame.values.tolist()
+    return format_price_table
 
 
 def star_reviews(query, database = "yelp_raw.db"):
@@ -282,6 +289,7 @@ def price_ratings(query, database = "yelp_raw.db"):
 
     return format_price_table
 
+
 def all_cuisines(query, database = "yelp_adjusted.db"):
     '''
     Get all cuisine types with >= 10 restaurants for a city from database
@@ -327,10 +335,10 @@ def all_cuisines(query, database = "yelp_adjusted.db"):
 
     return sorted(cuisine_table)
 
-def special_cuisine(cuisine, database = "yelp_adjusted.db"):
+
+def cuisine_stats(cuisine, database = "yelp_adjusted.db"):
     '''
-    Returns a value measuring whether a cuisine is unusually highly/lowly
-    rated based on data from other cities
+    Returns mean and standard deviation from a cuisine
     '''
     connection = sqlite3.connect(database)
     c = connection.cursor()
@@ -360,6 +368,7 @@ def special_cuisine(cuisine, database = "yelp_adjusted.db"):
     mean = stat.mean(ratings_table)
 
     return sd, mean
+
 
 def common_cuisines(query, database = "yelp_adjusted.db"):
     '''
@@ -398,7 +407,7 @@ def common_cuisines(query, database = "yelp_adjusted.db"):
     c.connection.close()
 
     result_frame = pd.DataFrame(result_table, columns=["Cuisine", "Rating", "# Restaurants"])
-    result_frame = result_frame.round(2) # Rounds values    
+    result_frame = result_frame.round(2) # Rounds values to second decimal place 
     result_frame = result_frame.sort_values("# Restaurants", ascending = False)
     top5 = result_frame.iloc[:5]
     result_frame = result_frame.set_index(["Cuisine"]) # Changes index to Cuisine

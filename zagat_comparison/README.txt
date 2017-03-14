@@ -6,7 +6,7 @@
 
 Files in this folder are used to scrape Zagat data for Chicago (although capability included
 theoretically for other cities) and complete record linkage to match up entries with existing
-Yelp data, and calculate the difference in averages across the two review sites. 
+Zagat data, and calculate the difference in averages across the two review sites. 
 A full listing of all files, as well as explanations of their purpose, can be found below. 
 Please note that each .py file includes summary information and usage instructions at the 
 beginning of the file as well.

@@ -7,6 +7,7 @@ import statistics as stat
 import numpy as np
 import pandas as pd
 from pandas.tools.plotting import table
+from textwrap import wrap
 
 def cuisine_highlights(database = "yelp_adjusted.db"):
     '''
@@ -32,7 +33,7 @@ def cuisine_highlights(database = "yelp_adjusted.db"):
 
     connection.commit()
     c.connection.close()
-    
+
     # Make dataframe of top 10 cuisines
     best_frame = pd.DataFrame(best_table, 
         columns=["Cuisine", "Rating", "# Reviews"])
@@ -45,6 +46,10 @@ def cuisine_highlights(database = "yelp_adjusted.db"):
     worst_frame = worst_frame.round(2)
     worst_list = worst_frame.values.tolist()
 
+    graph_cuisine_highlights(best_frame, worst_frame)
+
+
+def graph_cuisine_highlights(best_frame, worst_frame):
     # Creates bar graph of top cuisines
     low = best_frame["Rating"].min() - .05
     high = best_frame["Rating"].max() + .05
@@ -58,6 +63,7 @@ def cuisine_highlights(database = "yelp_adjusted.db"):
 
     x = [i + .5 for i in range(10)]
 
+    plt.figure(figsize=(13,5))
     plt.xticks(x, x_ticks, rotation = 16)
     plt.bar(x, best_frame["Rating"])
     plt.axis([0, 10.75, low, high])
@@ -75,11 +81,20 @@ def cuisine_highlights(database = "yelp_adjusted.db"):
     plt.ylabel("Avg Rating")
     plt.title("10 Worst Cuisines")
 
-    x_ticks = worst_frame["Cuisine"].tolist()
+    x_ticks_unformatted = worst_frame["Cuisine"].tolist()
+    x_ticks = []
+    for tick in x_ticks_unformatted:
+        tick.replace("American", "American\n")
+        tick.replace("Conveyor", "Conveyor\n")
+        x_ticks.append(tick)
 
     x = [i + .5 for i in range(10)]
 
-    plt.xticks(x, x_ticks, rotation = 16)
+    plt.figure(figsize=(10,8))
+    plt.gcf().subplots_adjust(bottom=0.25)
+    plt.xticks(x, x_ticks, rotation = 'vertical', horizontalalignment = 'left')
+    plt.gca().tick_params(axis='x', pad=10)
+    #plt.setp(plt.gca().get_xticklabels(), horizontalalignment='left')
     plt.bar(x, worst_frame["Rating"])
     plt.axis([0, 10.75, low, high])
 
@@ -87,7 +102,6 @@ def cuisine_highlights(database = "yelp_adjusted.db"):
     plt.savefig("worst_cuisines.png")
     plt.close("all")
 
-    return best_list, worst_list, result_table
 
 def price_ratings(database = "yelp_raw.db"):
     '''

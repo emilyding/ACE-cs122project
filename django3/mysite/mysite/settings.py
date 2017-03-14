@@ -10,6 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 
+'''
+Settings has been adjusted to allow admin use. Myapp and admin has been installed. Static file use has been enabled. I followed the instructions for using bootstrap's modern business template to learn how to use static files. Code sample was found here : https://startbootstrap.com/template-overviews/modern-business/
+'''
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 

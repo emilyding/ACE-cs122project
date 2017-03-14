@@ -1,14 +1,15 @@
 from django.shortcuts import render, get_object_or_404, render_to_response
-from .models import Question, Comment
+from .models import Comment, Compare
 from django.http import Http404
 from django import forms 
-from yelp_sql_nograph import get_top_cuisines, price_ratings, star_ratings
+from yelp_sql_nograph import get_top_cuisines, price_ratings, star_reviews, common_cuisines
 from city_summary_stats import get_summary_info
 from django.shortcuts import render, redirect
 from django import forms
 from django.utils import timezone
-from myapp.forms import MyCommentForm
+from myapp.forms import MyCommentForm, MyCompareForm
 from yelp_all_cities import cuisine_highlights
+from compare_cities import compare_cuisines
 import json
 
 def index(request):
@@ -40,6 +41,36 @@ def form(request):
         form = MyCommentForm()
  
         return render(request, "form.html", {'form': form})
+
+def compare(request):
+    if request.method == "POST":
+        form = MyCompareForm(request.POST)
+        if form.is_valid():
+            model_instance = form.save(commit=False)
+            model_instance.timestamp = timezone.now()
+            model_instance.save()
+            return redirect('/cresults')
+    else:
+        form = MyCompareForm()
+        return render(request, "compare.html", {'form': form})
+
+def cresults(request):
+    num = len(Compare.objects.all())
+    last_entry = get_object_or_404(Compare, pk = num)
+    args = {}
+    list_difference = compare_cuisines(args[0], args[1])
+    list_difference.sort(key = lambda x: x[3], reverse = True)
+    
+    cuisine_comparison = []
+    for entry in list_difference:
+        if entry[0] == args[2]:
+            cuisine_comparison = [[args[0]['city'], entry[1]], [args[1]['city'], entry[2]]]
+    
+    places_to_go_city1 = list_difference[:9]
+    places_to_go_city2 = list_difference[-10:]
+    bar1 = [[x[0], x[1], x[2]] for x in places_to_go_city1]
+    bar2 = [[x[0], x[1], x[2]] for x in places_to_go_city2]
+    return render(request, 'cresults.html', {'city1': str(args[0]['city']), 'city2': str(args[1]['city']), 'bar1': bar1, 'bar2': bar2, 'cuisine': args[2], 'comparison': cuisine_comparison})
 
 def results(request):
     num = len(Comment.objects.all())
@@ -87,7 +118,7 @@ def results(request):
         linenumperres.append(entrynumperres)
 
     #stars
-    data_stars = star_ratings(query)
+    data_stars = star_reviews(query)
     piestar = []
     linestar = []
     for data in data_stars:
@@ -95,9 +126,20 @@ def results(request):
         entryline = [str(data[0]), data[2]]
         piestar.append(entrypie)
         linestar.append(entryline)
+
+    #common
+    data_common = common_cuisines(query)
+    topcommon = []
+    scattercommon = []
+    for data in data_common:
+        entrytop = [str(data[0]), data[1]]
+        entryline = [str(data[0]), data[2]]
+        topcommon.append(entrypie)
+        scattercommon.append(entryline)
     #x = h(args)
     return render(request, 'charts.html', {'best_worst': bw, 'plt1_bar':barstop,'title': args['city'], 
-        "plt2_pie":pieprice, "plt3_line":lineprice, "plt4_line":linenumperres,"plt5_pie":piestar, "plt6_line":linestar, "info": info})
+        "plt2_pie":pieprice, "plt3_line":lineprice, "plt4_line":linenumperres,"plt5_pie":piestar, "plt6_line":linestar, 
+        "plt7_bar": topcommon, "info": info})
 
 def top_cuisines(request):
     

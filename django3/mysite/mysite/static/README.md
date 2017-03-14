@@ -1,3 +1,5 @@
+# unaltered : file created by bootstrap template from https://startbootstrap.com/template-overviews/modern-business/
+
 # [Start Bootstrap](http://startbootstrap.com/) - [Half Slider](http://startbootstrap.com/template-overviews/half-slider/)
 
 [Half Slider](http://startbootstrap.com/template-overviews/half-slider/) is an HTML starter template for [Bootstrap](http://getbootstrap.com/) created by [Start Bootstrap](http://startbootstrap.com/). This template features a full width, half page image slider header with captions.

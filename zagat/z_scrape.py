@@ -32,11 +32,9 @@ def run_code():
     #            "New York": [40.730610, -73.935242, 17.453]}
     #            "San Francisco": [37.733795, -122.446747, 6.846]}
     #            "Houston": [29.7604, -95.3698, 25.040]}
-
-    # Uncomment in first run to add headers to csv
-    #with open (csv_name + ".csv",'a') as filedata:                            
-    #    writer = csv.writer(filedata, delimiter=',')
-    #    writer.writerow(["name", "place_id", "street address", "city", "zipcode", "price_level", "rating", "latitude", "longitude"])
+    
+    # columns returned
+    # ["name", "place_id", "street address", "city", "zipcode", "price_level", "rating", "latitude", "longitude"])
 
     # Theoretically, code should loop over cities and pull data. However, due to constantly having
     # to change API keys mid-city, and inconsistencies in when the API keys stop working, functionally
@@ -49,9 +47,9 @@ def run_code():
         radius_deg = info[2] / 69
         
         #lat = info[0] - radius_deg # COMMENT OUT IF MID CITY
-        lat = 42.090136347826036# UNCOMMENT IF MID CITY, manually input last stopping point
+        lat = 42.090136347826036 # UNCOMMENT IF MID CITY, manually input last stopping point printed in terminal
         #lon = info[1] - radius_deg # COMMENT OUT IF MID CITY
-        lon = -87.39487265217385# UNCOMMENT IF MID CITY, manually input last stopping point
+        lon = -87.39487265217385 # UNCOMMENT IF MID CITY, manually input last stopping point printed in terminal
         start_lon = info[1] - radius_deg
         stop_lat = info[0] + radius_deg
         stop_lon = info[1] + radius_deg

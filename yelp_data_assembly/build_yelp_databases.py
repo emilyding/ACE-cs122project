@@ -196,6 +196,7 @@ def build_database(database, yelp_data):
         lat FLOAT(25),
         lon FLOAT(25)
         );"""
+    # NOTE: longitude before latitude
     
     create_cuisine_table = """
         CREATE TABLE cuisines (
@@ -228,8 +229,8 @@ def build_database(database, yelp_data):
         restaurant_entry.append(entry[11]) # Phone
         restaurant_entry.append(entry[8]) # Neighborhood
         restaurant_entry.append(entry[9]) # Address
-        restaurant_entry.append(entry[12]) # Latitude
-        restaurant_entry.append(entry[13]) # Longitude
+        restaurant_entry.append(entry[13]) # Latitude
+        restaurant_entry.append(entry[12]) # Longitude
 
         restaurant_sql.append(restaurant_entry)
         

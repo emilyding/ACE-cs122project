@@ -235,7 +235,6 @@ def get_top_cuisines(query, database = "yelp_raw.db"):
     tabla.scale(1.2, 1.2) # change size table
 
     plt.savefig(city + "_table.png")
-    plt.show()
     plt.close("all")
 
     return result_frame

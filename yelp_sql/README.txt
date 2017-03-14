@@ -10,7 +10,6 @@ is unique to this folder - primarily code that creates graphs (which are made di
 through Django)
 
 Non-py files:
-all_restaurants.csv
 cuisines_tags.csv
 starbucks_index.csv
 

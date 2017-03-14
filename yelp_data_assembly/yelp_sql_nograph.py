@@ -409,7 +409,8 @@ def common_cuisines(query, database = "yelp_adjusted.db"):
     result_frame = pd.DataFrame(result_table, columns=["Cuisine", "Rating", "# Restaurants"])
     result_frame = result_frame.round(2) # Rounds values to second decimal place 
     result_frame = result_frame.sort_values("# Restaurants", ascending = False)
-    top5 = result_frame.iloc[:5]
+    top5 = result_frame.iloc[:5].values.tolist()
     result_frame = result_frame.set_index(["Cuisine"]) # Changes index to Cuisine
+    result_list = result_frame.values.tolist()
 
     return top5, result_frame.values.tolist()

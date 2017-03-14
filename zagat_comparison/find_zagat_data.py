@@ -1,13 +1,11 @@
 import requests
 import re
-#import bs4
 import json
-#import sys
 import csv
 
 test_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=41.881832,-87.623177&radius=5000&type=restaurant&key="
-#url = "https://www.zagat.com/r/goosefoot-chicago"
 
+# Uncomment whichever API key is still functional as you run the code.
 # Camille's API key
 API = "AIzaSyCP58u53oJ_brOYoNkF0ktaCE2EyZaJIyA"
 
@@ -24,20 +22,26 @@ API = "AIzaSyCP58u53oJ_brOYoNkF0ktaCE2EyZaJIyA"
 # API = "AIzaSyCkSm8tFiiEFSoXc9ixXNLlMD0N3O52sno"
 
 def go():
+    '''
+    Loops over largest possible area in which restaurant data from that city could be found, 
+    and pulls restaurant data from Google Maps API, which contains Zagat review data,
+    using Nearby Searches and Place Searches.
+
+    Theoretically, code should loop over cities and pull data. However, due to constantly having
+    to change API keys mid-city, and inconsistencies in when the API keys stop working, functionally
+    this only works with manual runs. The code structure has been left in for the go function to 
+    demonstrate conceptual understanding of how it would work.
+
+    '''
     full_results = []
 
+    # Dictionary mapping city to lat lon location, and radius in miles
     locations = {"Chicago": [41.881832, -87.623177, 15.297]}#,
     #            "LA": [34.052235, -118.243683, 22.428]}
     #            "New York": [40.730610, -73.935242, 17.453]}
     #            "San Francisco": [37.733795, -122.446747, 6.846]}
     #            "Houston": [29.7604, -95.3698, 25.040]}
     
-    # columns returned
-    # ["name", "place_id", "street address", "city", "zipcode", "price_level", "rating", "latitude", "longitude"])
-
-    # Theoretically, code should loop over cities and pull data. However, due to constantly having
-    # to change API keys mid-city, and inconsistencies in when the API keys stop working, functionally
-    # this only works with manual runs.
     for city in locations:
         city_name = city
         info = locations[city]
@@ -59,6 +63,7 @@ def go():
             API, lat, lon, stop_lat, stop_lon, start_lon, csv_name)
         full_results = full_results + data
 
+    # Print statements to make manually running the code possible
     print(city_name)
     print("lat:", lat)
     print("lon:", lon)
@@ -67,7 +72,12 @@ def go():
 
 def city_search(API, lat, lon, stop_lat, stop_lon, start_lon, csv_name):
     '''
-    Pull restaurant data from a Nearby Search in Google Maps, write to csv
+    Pull restaurant data from a Nearby Search in Google Maps for a lat/lon location, 
+    writes to csv.
+
+    Columns in data csv:
+    ["name", "place_id", "street address", "city", "zipcode", "price_level", 
+    "rating", "latitude", "longitude"])
     '''
     url_1 = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
     url_2 = "&radius=1000&type=restaurant&key="
@@ -75,7 +85,7 @@ def city_search(API, lat, lon, stop_lat, stop_lon, start_lon, csv_name):
     results = []
     request_num = 0
         
-    while request_num < 100:
+    while request_num < 100: # Manual limit, around the limit when keys stop working
         # Loops over city area, pulls restaurant results
         if lat >= stop_lat:
             print("finished searching city")
@@ -83,13 +93,16 @@ def city_search(API, lat, lon, stop_lat, stop_lon, start_lon, csv_name):
 
         if lat <= stop_lat:            
             if lon < stop_lon:
+                # Builds URL
                 loc_url = "location=" + str(lat) + "," + str(lon)
                 url = url_1 + loc_url + url_2 + API
                 request_dict = get_results(url)
-
-                print(request_dict["status"])
+                print(request_dict["status"]) # Used to see when over query limit
+                
                 request_rows = get_info(request_dict, lat, lon)
                 results.append(request_rows)
+
+                # Write to csv
                 with open (csv_name + ".csv",'a') as filedata:                            
                     writer = csv.writer(filedata, delimiter=',')
                     writer.writerows(request_rows)
@@ -118,6 +131,7 @@ def city_search(API, lat, lon, stop_lat, stop_lon, start_lon, csv_name):
                             writer = csv.writer(filedata, delimiter=',')
                             writer.writerows(request_rows)
                         request_num += 1
+                
                 lon += .01
                 request_num += 1
                 print(lat, lon)
@@ -134,7 +148,7 @@ def city_search(API, lat, lon, stop_lat, stop_lon, start_lon, csv_name):
 def get_info(request_dict, lat, lon):
     '''
     For each location found through Nearby Search, conduct a Place Search to pull
-    address data
+    address data from the latitude longitude coordinate.
     '''
 
     request_rows = []
@@ -208,6 +222,7 @@ def get_results(url):
     
     Input:
         - url
+
     Output:
         - list of result restaurants
     '''

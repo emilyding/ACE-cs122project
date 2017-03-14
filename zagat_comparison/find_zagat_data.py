@@ -23,7 +23,7 @@ API = "AIzaSyCP58u53oJ_brOYoNkF0ktaCE2EyZaJIyA"
 # Fifth API key
 # API = "AIzaSyCkSm8tFiiEFSoXc9ixXNLlMD0N3O52sno"
 
-def run_code():
+def go():
     full_results = []
 
     locations = {"Chicago": [41.881832, -87.623177, 15.297]}#,

@@ -148,18 +148,15 @@ def find_cuisines(filepath="cuisines_tags.csv"):
         cuisine_list = list(reader)
 
     # Translate to usable form
-    cuisine_tags = set()
+    cuisine_tags = []
     for item in cuisine_list:
-        search = re.search(r'\((.*?)\)', item[0]).group()[1:-1]
+        search = re.search(r'^.*(?=\s\()', item[0]).group()
 
-        # Creates exceptions for American (New) and American (Traditional) due
-        # to their unique formatting
-        if search == "New":
-            search = "newamerican"
-        if search == "Traditional":
-            search = 'tradamerican'
+        # Delete spaces, convert to lowercase
+        search = search.lower()
+        search = search.replace(' ', '')
+        cuisine_tags.append(search)
 
-        cuisine_tags.add(search)
 
     return cuisine_tags
 
@@ -197,7 +194,6 @@ def build_database(database, yelp_data):
         lat FLOAT(25),
         lon FLOAT(25)
         );"""
-    # NOTE: longitude before latitude
     
     create_cuisine_table = """
         CREATE TABLE cuisines (

@@ -19,7 +19,7 @@ def get_top_cities(query, database = "yelp_adjusted.db"):
                      "limit": 20}
 
     Output:
-        - list of tuples
+        - list of lists
           [0]: city name
           [1]: average rating
           [2]: number of restaurants of that cuisine in the city
@@ -80,7 +80,7 @@ def get_top_cuisines(query, database = "yelp_raw.db"):
                            "price": "$$$",
                            "limit": 10,
                            "worst": True}
-        - database name
+
     Ouput:
         - list of lists
           [0]: list of headers
@@ -186,7 +186,10 @@ def star_reviews(query, database = "yelp_raw.db"):
         - database
 
     Output:
-        - list of lists: [rating, # restaurants, avg # reviews / restaurant]
+        - list of lists: 
+          [0]: rating
+          [1]: # restaurants
+          [2]: avg # reviews / restaurant]
     '''
 
     connection = sqlite3.connect(database)
@@ -222,8 +225,6 @@ def star_reviews(query, database = "yelp_raw.db"):
 def price_ratings(query, database = "yelp_raw.db"):
     '''
     Gets avg ratings for each price category for a city
-    Creates and saves two plots: graph of avg ratings by price category, pie chart
-    showing number of restaurants in each price category
 
     Inputs:
         - query (dict): contains desired city name
@@ -232,10 +233,12 @@ def price_ratings(query, database = "yelp_raw.db"):
         - database
 
     Output:
-        - list of lists: [price, avg rating, # restaurants, avg # reviews / restaurant]
-        - price_ratings_city.png
-        - price_restaurants_city.png
-    '''
+        - list of lists
+          [0]: price
+          [1]: avg rating
+          [2]: # restaurants
+          [3]: avg # reviews / restaurant]
+        '''
 
     connection = sqlite3.connect(database)
     c = connection.cursor()

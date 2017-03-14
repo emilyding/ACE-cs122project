@@ -18,6 +18,7 @@ Files:
 	charts.html: the results page after form.html is submitted. Displays graphs and facts
 	compare.html: a form to input two cities to compare.
 	cresults.html: the results after compare.html is submitted. Diplays graphs and facts.
+	cuisine.html: the cuisine lookup input form
 	cuiresults.html: the results page after cuisine.html is submitted. Displays graphs 
 	form.html: a form to input city and specifications to see city snapshot.
 	index.html: the home page

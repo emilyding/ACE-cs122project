@@ -2,11 +2,7 @@ import sqlite3
 import csv
 import string
 import math
-import matplotlib.pyplot as plt
 import statistics as stat
-import numpy as np
-import pandas as pd
-from pandas.tools.plotting import table
 
 def get_top_cities(query, database = "yelp_adjusted.db"):
     '''
@@ -60,15 +56,14 @@ def get_top_cities(query, database = "yelp_adjusted.db"):
         limit = 10
     
     result_table = result_table[:limit]
+    result_list = []
+    for result in result_table:
+        result = list(result)
+        result[1] = round(result[1], 2)
+        result[0] = result[0].title()
+        result_list.append(result)
 
-    result_frame = pd.DataFrame(result_table, columns=["City", "Rating", "# Restaurants"])
-    result_frame = result_frame.round(2) # Rounds values to second decimal place
-    result_frame["City"] = result_frame["City"].str.title() # Capitalize city names
-
-    length = len(result_frame.index)
-    result_frame.index = [i + 1 for i in range(length)]
-
-    return result_frame.values.tolist()
+    return result_list
         
     
 def get_top_cuisines(query, database = "yelp_raw.db"):
@@ -135,16 +130,15 @@ def get_top_cuisines(query, database = "yelp_raw.db"):
     else:
         limit = 10
 
-    format_price_table = format_cuisine_table(limit, result_table)
-    result_frame = pd.DataFrame(format_price_table, 
-        columns=["Cuisine", "Price", "Rating", "# Restaurants", "Total Reviews", "All Cities Comparison"])
-    result_frame = result_frame.round(2)
-    result_frame["Cuisine"] = result_frame["Cuisine"].str.title() # Capitalize city names
+    result_table = result_table[:limit]
+    result_list = []
+    for result in result_table:
+        result = list(result)
+        result[1] = round(result[1], 2)
+        result[0] = result[0].title()
+        result_list.append(result)
 
-    length = len(result_frame.index)
-    result_frame.index = [i + 1 for i in range(length)]
-
-    return result_frame.values.tolist()
+    return result_list
 
 
 def format_cuisine_table(limit, result_table):
@@ -219,20 +213,10 @@ def star_reviews(query, database = "yelp_raw.db"):
     # Gets average # reviews per restaurant
     for index, result in enumerate(result_table):
         avg_num_reviews = result[2] / result[1]
+        avg_num_reviews = round(avg_num_reviews, 2)
         result_table[index] = [result[0], result[1], avg_num_reviews]
-    
-    result_frame = pd.DataFrame(result_table, 
-        columns=["Rating", "# Restaurants", "Avg Reviews Per Restaurant"])
-    result_frame = result_frame.round(2)
-    result_list = result_frame.values.tolist()
-    
-    # Undoes the side effect of calling values to list, which turns # Restaurants
-    # into floats
-    for index, result in enumerate(result_list):
-        result[1] = int(result[1])
-        result_list[index] = result
 
-    return result_list
+    return result_table
 
 
 def price_ratings(query, database = "yelp_raw.db"):
@@ -282,10 +266,6 @@ def price_ratings(query, database = "yelp_raw.db"):
 
     connection.commit()
     c.connection.close()
-
-    result_frame = pd.DataFrame(format_price_table, 
-        columns=["Price", "Rating", "# Restaurants", "Avg Reviews Per Restaurant"])
-    result_frame = result_frame.round(2)
 
     return format_price_table
 
@@ -380,7 +360,7 @@ def common_cuisines(query, database = "yelp_adjusted.db"):
             query = {"city": "Los Angeles"}
 
     Output:
-        - pandas dataframe of sorted most common cuisines
+        - list of lists of sorted most common cuisines
     '''
 
     connection = sqlite3.connect(database)
@@ -405,12 +385,16 @@ def common_cuisines(query, database = "yelp_adjusted.db"):
 
     connection.commit()
     c.connection.close()
+    
+    full_result_list = []
+    result_list = []
 
-    result_frame = pd.DataFrame(result_table, columns=["Cuisine", "Rating", "# Restaurants"])
-    result_frame = result_frame.round(2) # Rounds values to second decimal place 
-    result_frame = result_frame.sort_values("# Restaurants", ascending = False)
-    top5 = result_frame.iloc[:5].values.tolist()
-    result_frame = result_frame.set_index(["Cuisine"]) # Changes index to Cuisine
-    result_list = result_frame.values.tolist()
+    for result in result_table:
+        result = list(result)
+        result[1] = round(result[1], 2)
+        full_result_list.append(result)
+        result_list.append(result[1:])
+    full_result_list.sort(key = lambda x: x[2], reverse = True)
+    result_list.sort(key = lambda x: x[1], reverse = True)
 
-    return top5, result_frame.values.tolist()
+    return full_result_list[:5], result_list[:10]
